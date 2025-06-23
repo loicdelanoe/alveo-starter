@@ -86,4 +86,28 @@ class FileService
             Storage::disk('public')->delete(str_replace('/storage', '', $media->path));
         }
     }
+
+    public function uploadFavicon($file)
+    {
+
+        // Delete existing favicon directory
+        Storage::disk('public')->deleteDirectory('uploads/favicon');
+
+        $uuid = Str::uuid();
+
+        $fileName = $uuid.'.'.$file->getClientOriginalExtension();
+
+        $image = Storage::disk('public')->putFileAs('uploads/favicon', $file, $fileName);
+
+        $media = Media::create([
+            'name' => $file->getClientOriginalName(),
+            'path' => Storage::url($image),
+            'type' => $file->getClientMimeType(),
+            'metadata' => [
+                'alt' => $file->getClientOriginalName(),
+            ],
+        ]);
+
+        return $media;
+    }
 }

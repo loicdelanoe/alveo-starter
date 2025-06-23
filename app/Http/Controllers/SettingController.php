@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateSettingRequest;
 use App\Models\Setting;
-use Illuminate\Http\Request;
+use App\Service\FileService;
 use Inertia\Inertia;
 
 class SettingController extends Controller
@@ -34,9 +35,20 @@ class SettingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UpdateSettingRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        if ($request->hasFile('favicon')) {
+            $favicon = (new FileService)->uploadFavicon($validated['favicon']);
+
+            $validated['favicon'] = $favicon->path;
+        } else {
+            unset($validated['favicon']);
+        }
+
+        $settings = Setting::singleton();
+        $settings->update($validated);
     }
 
     /**
@@ -58,18 +70,7 @@ class SettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
-    {
-        // dd($request->all());
-        // $validated = $request->validate([
-        //     'site_name' => 'required|string|max:255',
-        //     'site_description' => 'nullable|string|max:500',
-        //     // Add other settings validation rules as needed
-        // ]);
-
-        $settings = Setting::singleton();
-        $settings->update($request->all());
-    }
+    public function update(UpdateSettingRequest $request) {}
 
     /**
      * Remove the specified resource from storage.

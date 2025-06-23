@@ -8,7 +8,9 @@ const page = usePage();
 </script>
 
 <template>
-    <Head :title="`Admin - ${page.props.settings.site_name}`"> </Head>
+    <Head :title="`Admin - ${page.props.settings.site_name}`">
+        <link rel="icon" :href="page.props.settings.favicon" type="image/svg+xml" />
+    </Head>
     <div class="layout flex bg-[#f5f5f5]">
         <h1 class="sr-only">Alveo</h1>
 

@@ -23,6 +23,7 @@ const title = computed(() => `${props.page.title} - ${pageProps.settings.site_na
         <meta property="og:description" :content="pageProps.settings.site_description ?? page.meta_description" />
         <meta property="og:type" :content="page.og_type" />
         <meta property="og:url" :content="pageProps.ziggy.location" />
+        <link rel="icon" :href="pageProps.settings.favicon" type="image/svg+xml" />
     </Head>
 
     <h1 class="sr-only">{{ title }}</h1>
