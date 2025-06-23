@@ -15,7 +15,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const pinia = createPinia();
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? `${title}` : appName),
     resolve: async (name) => {
         const page = await resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue'));
 

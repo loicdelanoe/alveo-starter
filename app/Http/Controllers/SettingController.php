@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SettingController extends Controller
 {
+    protected Setting $settings;
+
+    public function __construct(Setting $settings)
+    {
+        $this->settings = $settings;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -50,9 +58,17 @@ class SettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        // dd($request->all());
+        // $validated = $request->validate([
+        //     'site_name' => 'required|string|max:255',
+        //     'site_description' => 'nullable|string|max:500',
+        //     // Add other settings validation rules as needed
+        // ]);
+
+        $settings = Setting::singleton();
+        $settings->update($request->all());
     }
 
     /**

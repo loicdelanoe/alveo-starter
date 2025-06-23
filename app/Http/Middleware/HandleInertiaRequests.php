@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\BlockType;
 use App\Models\CollectionType;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -34,6 +35,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'settings' => Setting::singleton(),
             'auth' => [
                 'user' => $request->user(),
                 'roles' => $request->user() ? $request->user()->getRoleNames()->toArray() : [],
