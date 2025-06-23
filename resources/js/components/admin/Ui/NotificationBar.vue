@@ -40,7 +40,7 @@ watch(
 <template>
     <Transition>
         <span
-            class="bg-secondary-950 fixed top-9 right-5 z-10 flex gap-3 rounded-lg border border-[#2AA383] px-6 py-4 font-medium text-[#2AA383]"
+            class="bg-secondary-950 bottom-9 right-5 gap-3 rounded-lg px-6 py-4 font-medium fixed z-10 flex border border-[#2AA383] text-[#2AA383]"
             v-if="showNotification"
         >
             <BadgeSuccess />
