@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, watch } from 'vue';
+import { computed, onMounted, onUnmounted, watch } from 'vue';
 
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
 import TextAreaInput from '@/components/admin/Form/TextAreaInput.vue';
@@ -25,10 +25,10 @@ const selectedMedia = computed<TMedia>(() => {
 });
 
 const isOpen = defineModel('isOpen');
+
 const form = useForm({
-    name: '',
-    //   name: selectedMedia.value.name ?? '',
-    metadata: {} as MetaData,
+    name: selectedMedia.value?.name ?? '',
+    metadata: selectedMedia.value?.metadata ?? ({} as MetaData),
 });
 
 const nextMedia = () => {
@@ -40,6 +40,8 @@ const nextMedia = () => {
 };
 
 const onSubmit = () => {
+    if (!selectedMedia.value) return;
+
     form.patch(route('admin.media.update', selectedMedia.value.id));
 };
 
@@ -57,23 +59,14 @@ const handleEscape = (e: KeyboardEvent) => {
     }
 };
 
-watch(isOpen, (newValue) => {
-    if (newValue) {
-        window.addEventListener('keydown', handleEscape);
-    } else {
-        window.removeEventListener('keydown', handleEscape);
-    }
-});
+onMounted(() => document.addEventListener('keydown', handleEscape));
+onUnmounted(() => document.removeEventListener('keydown', handleEscape));
 
 watch(selectedMedia, (newValue) => {
     if (!newValue) return;
 
     form.name = newValue.name;
     form.metadata = newValue.metadata;
-});
-
-onBeforeUnmount(() => {
-    window.removeEventListener('keydown', handleEscape);
 });
 </script>
 
@@ -116,13 +109,7 @@ onBeforeUnmount(() => {
                             <h3 class="text-xl font-medium">Informations</h3>
                         </div>
                         <InputLabel label="Name" type="text" name="name" v-model="form.name" />
-                        <TextAreaInput
-                            v-if="selectedMedia.metadata.alt"
-                            label="Alternative text"
-                            type="text"
-                            name="alt"
-                            v-model="form.metadata.alt"
-                        />
+                        <TextAreaInput v-if="selectedMedia.metadata.alt" label="Description" type="text" name="alt" v-model="form.metadata.alt" />
                         <div class="gap-2 mt-auto flex w-full">
                             <Can permission="edit medias">
                                 <Action tag="button" variant="primary" class="w-full" @click="onSubmit"> Update </Action>
