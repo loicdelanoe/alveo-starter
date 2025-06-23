@@ -74,7 +74,7 @@ class FileService
 
     public function deleteFile($media)
     {
-        if (Str::startsWith($media->type, 'image/' && ! Str::contains($media->type, 'svg'))) {
+        if (Str::startsWith($media->type, 'image/') && ! Str::contains($media->type, 'svg')) {
             $segments = explode('/', $media->path['original']);
 
             $filteredSegments = array_slice($segments, 2, -1);
