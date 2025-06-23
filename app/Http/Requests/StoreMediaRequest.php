@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
 
 class StoreMediaRequest extends FormRequest
 {
@@ -22,8 +23,9 @@ class StoreMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'files' => 'required|array',
-            'files.*' => 'required|file',
+            'files' => 'required|array|max:10240',
+            'files.*' => ['required', 'file', File::types(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'mp4', 'mov', 'svg', 'pdf'])
+                ->max(10240)],
         ];
     }
 

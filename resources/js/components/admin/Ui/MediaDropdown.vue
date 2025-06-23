@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import ErrorMessage from '../Form/ErrorMessage.vue';
 
 const isDragging = ref(false);
+
 const form = useForm({
     files: null,
 });
+
+const emit = defineEmits(['closeModal']);
 
 function handleDrop(event) {
     isDragging.value = false;
@@ -19,6 +23,7 @@ function handleDrop(event) {
             preserveScroll: true,
             onSuccess: () => {
                 form.reset('files');
+                emit('closeModal');
             },
         });
     }
@@ -31,6 +36,7 @@ function handleChange(e) {
         preserveScroll: true,
         onSuccess: () => {
             form.reset('files');
+            emit('closeModal');
         },
     });
 }
@@ -49,6 +55,9 @@ function handleChange(e) {
             <p class="font-medium text-secondary-950">Drag files here</p>
             <p class="text-sm text-secondary-500">or click to choose</p>
             <input type="file" multiple class="inset-0 absolute cursor-pointer opacity-0" @change="handleChange" />
+            <template v-if="form.errors">
+                <ErrorMessage v-for="(value, key) in form.errors" :key="key" :error="value" />
+            </template>
         </div>
     </div>
 </template>

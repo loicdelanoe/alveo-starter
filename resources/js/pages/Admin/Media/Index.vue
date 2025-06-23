@@ -6,7 +6,6 @@ import Media from '@/components/admin/Ui/Media.vue';
 import MediaDropdown from '@/components/admin/Ui/MediaDropdown.vue';
 import TheLightbox from '@/components/admin/Ui/TheLightbox.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
-import MediaCreate from '@/Pages/Admin/Media/Create.vue';
 
 type Paths = {
     [key: string]: string;
@@ -47,7 +46,7 @@ const openLightbox = (index: number) => {
         <template #action>
             <Can permission="create medias">
                 <Modal label="Upload Media" title="Choose a media" variant="primary" size="4xl" position="center" v-model="isOpen" icon="plus">
-                    <MediaCreate @close-modal="isOpen = false" />
+                    <MediaDropdown class="h-90 w-full" @close-modal="isOpen = false" />
                 </Modal>
             </Can>
         </template>
