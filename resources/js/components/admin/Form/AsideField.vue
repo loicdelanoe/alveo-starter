@@ -10,29 +10,12 @@ import { Form, useFieldStore } from '@/stores/field';
 
 import { slugify } from '../utils/text';
 
-import type { PageProps, User } from '@/types';
-
 const { form } = defineProps<{
     form: InertiaForm<any>;
 }>();
 
-export interface ExtendedPageProps extends PageProps {
-    flash: {
-        success?: string;
-        error?: string;
-        info?: string;
-    };
-    fields: string[];
-    auth: {
-        user: User;
-        permissions: string[];
-        roles: string[];
-    };
-    collectionTypes: { id: number; name: string }[];
-}
-
 const fieldStore = useFieldStore();
-const page = usePage<ExtendedPageProps>();
+const page = usePage();
 const emit = defineEmits(['closeModal']);
 
 const fieldTypes: string[] = page.props.fields;
@@ -54,8 +37,8 @@ watch(
 </script>
 
 <template>
-    <aside class="flex flex-col gap-6">
-        <div class="flex flex-col gap-2">
+    <aside class="gap-6 flex flex-col">
+        <div class="gap-2 flex flex-col">
             <SelectInput name="type" label="Type" :options="fieldTypes" v-model="fieldStore.field.type" :error="fieldStore.errors.type" />
             <InputLabel
                 type="text"
@@ -77,14 +60,14 @@ watch(
 
         <!-- Repeater fields -->
         <div
-            class="bg-secondary-50 flex flex-col gap-3 rounded-md p-4"
+            class="bg-secondary-50 gap-3 rounded-md p-4 flex flex-col"
             v-if="fieldStore.field.type === 'repeater' && fieldStore.field.repeaterFields"
         >
             <div class="flex justify-between">
-                <span class="inline-flex text-xl font-medium">Repeater fields</span>
+                <span class="text-xl font-medium inline-flex">Repeater fields</span>
                 <IconChevronDown />
             </div>
-            <div v-for="(field, index) in fieldStore.field.repeaterFields" class="flex gap-2" :key="index">
+            <div v-for="(field, index) in fieldStore.field.repeaterFields" class="gap-2 flex" :key="index">
                 <SelectInput name="type" label="Type" :options="fieldTypes" v-model="field.type" :error="fieldStore.errors.type" class="min-w-1/4" />
                 <InputLabel type="text" label="Label" name="label" v-model="field.label" :error="fieldStore.errors.label" />
                 <InputLabel type="text" label="Name" name="name" v-model="field.name" :error="fieldStore.errors.name" />
@@ -108,7 +91,7 @@ watch(
         <!-- Collection field -->
         <!-- <SelectInput name="collection" label=""/> -->
 
-        <div class="flex flex-col gap-2">
+        <div class="gap-2 flex flex-col">
             <p class="text-xl font-medium">Validation</p>
             <ToggleInput label="Required" name="required" v-model="fieldStore.field.validation" value="required" />
         </div>
