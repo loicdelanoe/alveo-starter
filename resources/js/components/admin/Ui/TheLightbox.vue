@@ -10,7 +10,7 @@ import IconTrash from '@/components/admin/Icon/IconTrash.vue';
 import Media from '@/components/admin/Ui/Media.vue';
 import { deleteItem } from '@/utils/utils';
 
-import type { MetaData, Media as TMedia } from '@/Pages/Admin/Media/Index.vue';
+import type { MetaData, Media as TMedia } from '@/pages/Admin/Media/Index.vue';
 
 const props = defineProps<{
     medias: TMedia[];
@@ -66,6 +66,8 @@ watch(isOpen, (newValue) => {
 });
 
 watch(selectedMedia, (newValue) => {
+    if (!newValue) return;
+
     form.name = newValue.name;
     form.metadata = newValue.metadata;
 });
@@ -78,16 +80,16 @@ onBeforeUnmount(() => {
 <template>
     <Transition name="appear">
         <Teleport to="body">
-            <div v-if="isOpen" class="fixed inset-0 z-20 flex items-center justify-center bg-black/50 md:p-5" @click.self="isOpen = false">
-                <div class="flex h-full w-full flex-col md:flex-row md:gap-4">
+            <div v-if="isOpen" class="inset-0 bg-black/50 md:p-5 fixed z-20 flex items-center justify-center" @click.self="isOpen = false">
+                <div class="md:flex-row md:gap-4 flex h-full w-full flex-col">
                     <div class="relative flex h-full w-full">
-                        <Action tag="button" variant="icon secondary" class="absolute top-2 right-2 md:top-0 md:right-0" @click="isOpen = false">
+                        <Action tag="button" variant="icon secondary" class="top-2 right-2 md:top-0 md:right-0 absolute" @click="isOpen = false">
                             <span class="sr-only">Close lightbox</span>
                             <IconClose />
                         </Action>
 
                         <!-- Navigation -->
-                        <div class="center-x absolute bottom-0 flex justify-center gap-1 rounded-lg max-sm:mb-2">
+                        <div class="center-x bottom-0 gap-1 rounded-lg max-sm:mb-2 absolute flex justify-center">
                             <Action tag="button" variant="primary" @click="previousMedia">
                                 <IconChevronLeft />
                                 <span class="sr-only">Previous</span>
@@ -101,7 +103,7 @@ onBeforeUnmount(() => {
                         <!-- Media -->
                         <Media
                             v-if="selectedMedia"
-                            class="m-auto w-full max-w-2/3 rounded-lg"
+                            class="rounded-lg m-auto w-full max-w-2/3"
                             :media="selectedMedia"
                             :key="selectedMedia.id"
                             controls
@@ -109,7 +111,7 @@ onBeforeUnmount(() => {
                     </div>
 
                     <!-- Aside -->
-                    <div class="flex h-full w-full flex-col gap-4 rounded-lg bg-white p-6 md:w-[45%] md:overflow-auto">
+                    <div class="gap-4 rounded-lg bg-white p-6 md:w-[45%] md:overflow-auto flex h-full w-full flex-col">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xl font-medium">Informations</h3>
                         </div>
@@ -121,7 +123,7 @@ onBeforeUnmount(() => {
                             name="alt"
                             v-model="form.metadata.alt"
                         />
-                        <div class="mt-auto flex w-full gap-2">
+                        <div class="gap-2 mt-auto flex w-full">
                             <Can permission="edit medias">
                                 <Action tag="button" variant="primary" class="w-full" @click="onSubmit"> Update </Action>
                             </Can>
