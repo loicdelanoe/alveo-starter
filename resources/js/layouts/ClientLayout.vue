@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { getBlockCpt } from '@/alveo/blockRegistry';
 import { Menu } from '@/types/models/menu';
 import { Page } from '@/types/models/page';
-import { getBlockCpt } from '@/utils/mapping';
 import { Head, usePage } from '@inertiajs/vue3';
+import type { Component } from 'vue';
+import { defineAsyncComponent } from 'vue';
 
 defineProps<{
     page: Page;
@@ -23,14 +25,14 @@ const pageProps = usePage().props;
 
     <h1 class="sr-only">{{ page.title }}</h1>
 
-    <pre>{{ page }}</pre>
+    <!-- <pre>{{ page }}</pre> -->
 
     <main class="flex flex-col">
         <Suspense>
             <component
                 v-for="block in page.blocks"
                 :key="block.id"
-                :is="getBlockCpt(block.block_type.type)"
+                :is="defineAsyncComponent(() => getBlockCpt(block.block_type.type) as Promise<Component>)"
                 :content="block.content"
                 :collections="page.collections"
             />

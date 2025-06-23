@@ -31,12 +31,6 @@ export const getInputCpt = (fieldType: string) => {
     return cptMap[fieldType] || InputLabel;
 };
 
-export const getBlockCpt = (blockType: string) => {
-    const cptMap: { [key: string]: Component } = {};
-
-    return cptMap[blockType];
-};
-
 export const getIconCpt = (icon: string) => {
     const cptMap: { [key: string]: Component } = {
         plus: IconPlus,
@@ -53,8 +47,7 @@ export const getIconCpt = (icon: string) => {
 };
 
 export const getCollectionPage = (type: string) => {
-    const cptMap: { [key: string]: Component } = {
-    };
+    const cptMap: { [key: string]: Component } = {};
 
     return cptMap[type];
 };
