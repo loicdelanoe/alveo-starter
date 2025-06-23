@@ -5,6 +5,7 @@ namespace App\Concerns;
 use App\Models\Collection;
 use App\Models\Media;
 use App\Models\Page;
+use League\CommonMark\CommonMarkConverter;
 
 trait HasHydration
 {
@@ -55,6 +56,13 @@ trait HasHydration
                     $media = Media::whereIn('id', $mediaIds)->get();
 
                     $content[$field['name']] = $media;
+                    break;
+                case 'markdown':
+                    $markdownContent = $content[$field['name']];
+
+                    $converter = new CommonMarkConverter;
+
+                    $content[$field['name']] = $converter->convert($markdownContent)->getContent();
                     break;
             }
         }
