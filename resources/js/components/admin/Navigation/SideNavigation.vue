@@ -19,6 +19,7 @@ import Can from '@/components/admin/Permission/Can.vue';
 import CollapseButton from '@/components/admin/Ui/CollpaseButton.vue';
 import { useSidebarStore } from '@/stores/sidebar';
 
+import Alveo from '../Icon/Alveo.vue';
 import IconPlus from '../Icon/IconPlus.vue';
 import IconSquareArrowRight from '../Icon/IconSquareArrowRight.vue';
 
@@ -31,12 +32,13 @@ const user = computed(() => page.props.auth.user);
 
 <template>
     <aside
-        class="sidebar bg-secondary-950 text-accent-50 fixed top-0 bottom-0 z-10 flex h-dvh w-68 flex-col gap-7 rounded-r-lg px-6 py-7 transition"
+        class="sidebar bg-secondary-950 text-accent-50 top-0 bottom-0 w-68 gap-7 rounded-r-lg px-6 py-7 fixed z-10 flex h-dvh flex-col transition"
         :class="sidebar.classes"
     >
         <h2 class="sr-only">Side navigation</h2>
-        <div class="flex items-center gap-2">
-            <img src="/images/alveo-logo.svg" alt="Logo" class="" />
+        <div class="gap-2 flex items-center">
+            <Alveo class="fill-accent-400 w-28" />
+            <!-- <img src="/images/alveo-logo.svg" alt="Logo" class="" /> -->
             <!-- <div class="w-8 h-8 bg-accent-300 rounded-md"></div> -->
             <!-- <h2 class="text-xl ">Site Name</h2> -->
             <button v-if="width < 768" @click="sidebar.toggle" class="ml-auto cursor-pointer">
@@ -44,9 +46,9 @@ const user = computed(() => page.props.auth.user);
                 <IconClose />
             </button>
         </div>
-        <nav class="no-scrollbar flex h-full w-full flex-col gap-6 overflow-auto">
+        <nav class="no-scrollbar gap-6 flex h-full w-full flex-col overflow-auto">
             <h3 class="sr-only">Navigation</h3>
-            <a class="flex items-center gap-3 hover:underline" target="_blank" href="/">
+            <a class="gap-3 flex items-center hover:underline" target="_blank" href="/">
                 Go to website
                 <IconSquareArrowRight />
             </a>
@@ -158,7 +160,7 @@ const user = computed(() => page.props.auth.user);
             </NavigationGroup>
         </nav>
 
-        <div class="flex items-center justify-between gap-2.5">
+        <div class="gap-2.5 flex items-center justify-between">
             <div class="flex flex-col">
                 <span class="font-medium">{{ user.name }}</span>
                 <span class="text-sm">{{ user.email }}</span>

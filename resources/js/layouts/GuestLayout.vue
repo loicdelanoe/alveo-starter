@@ -1,24 +1,22 @@
 <script setup lang="ts">
-import Alveo from '@/components/admin/Icon/Alveo.vue'
+import Alveo from '@/components/admin/Icon/Alveo.vue';
 
 defineProps<{
-  title?: string
-}>()
+    title?: string;
+}>();
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center bg-gray-100">
-    <div class="w-0 h-0 md:w-1/2 md:h-screen">
-      <div class="w-full bg-accent-400 flex items-center justify-center h-full">
-        <Alveo width="w-1/3" />
-      </div>
+    <div class="bg-gray-100 flex min-h-screen items-center">
+        <div class="w-0 h-0 md:w-1/2 md:h-screen">
+            <div class="bg-accent-400 flex h-full w-full items-center justify-center">
+                <Alveo class="w-1/3" />
+            </div>
+        </div>
+        <div class="md:w-1/2 md:max-w-[480px] px-4 relative mx-auto flex max-h-screen min-h-screen w-full flex-col justify-center overflow-auto">
+            <slot name="header" />
+            <h1 class="text-3xl font-medium mb-10">{{ title }}</h1>
+            <slot />
+        </div>
     </div>
-    <div
-      class="min-h-screen justify-center flex flex-col w-full md:w-1/2 max-h-screen overflow-auto mx-auto md:max-w-[480px] px-4 relative"
-    >
-      <slot name="header" />
-      <h1 class="text-3xl font-medium mb-10">{{ title }}</h1>
-      <slot />
-    </div>
-  </div>
 </template>
