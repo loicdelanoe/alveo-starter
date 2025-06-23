@@ -116,8 +116,6 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
             <p class="italic opacity-50">Define as homepage</p>
         </div>
 
-        <pre>{{ form.errors }}</pre>
-
         <div class="gap-5 lg:grid-cols-3 relative grid grid-cols-1">
             <div class="lg:col-span-2 flex flex-col">
                 <TabsHead :tabs="tabs" v-model="tab" />
