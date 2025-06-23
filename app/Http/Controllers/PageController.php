@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\hasDynamicValidation;
 use App\Http\Requests\StorePageRequest;
 use App\Http\Requests\UpdatePageRequest;
 use App\Models\Block;
@@ -12,6 +13,8 @@ use Inertia\Inertia;
 
 class PageController extends Controller
 {
+    use hasDynamicValidation;
+
     /**
      * Display a listing of the resource.
      */
@@ -44,12 +47,22 @@ class PageController extends Controller
 
         $pageData = collect($validated)->except('blocks')->toArray();
 
+        $pageData = collect($validated)->except('blocks')->toArray();
+
+        $types = collect($validated['blocks'])->map(function ($block) {
+            return Block::find($block['id'])->blockType;
+        })->all();
+
+        $this->validateAllBlocks($validated, $types);
+
         $page = Page::create($pageData);
 
         // Update blocks
-        foreach ($validated['blocks'] as $block) {
-            Block::where('id', $block['id'])->update([
-                'content' => $block['content'],
+        foreach ($validated['blocks'] as $validatedBlock) {
+            $block = Block::findOrFail($validatedBlock['id']);
+
+            $block->update([
+                'content' => $validatedBlock['content'],
             ]);
         }
 
@@ -92,13 +105,21 @@ class PageController extends Controller
         $validated = $request->validated();
 
         $pageData = collect($validated)->except('blocks')->toArray();
+
+        $types = collect($validated['blocks'])->map(function ($block) {
+            return Block::find($block['id'])->blockType;
+        })->all();
+
+        $this->validateAllBlocks($validated, $types);
+
         $page->update($pageData);
 
         // Update blocks
-        // TODO: Validate blocks
-        foreach ($validated['blocks'] as $block) {
-            Block::where('id', $block['id'])->update([
-                'content' => $block['content'],
+        foreach ($validated['blocks'] as $validatedBlock) {
+            $block = Block::findOrFail($validatedBlock['id']);
+
+            $block->update([
+                'content' => $validatedBlock['content'],
             ]);
         }
 

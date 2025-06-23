@@ -36,7 +36,7 @@ class BlockController extends Controller
      */
     public function store(Request $request, BlockType $blockType)
     {
-        $validated = $this->validateBlock($request, $blockType);
+        $validated = $this->validateBlock($request->all(), $blockType);
 
         $validated['block_type_id'] = $blockType->id;
 
@@ -77,7 +77,7 @@ class BlockController extends Controller
     {
         $block->load(['blockType']);
 
-        $validated = $this->validateBlock($request, $block->blockType);
+        $validated = $this->validateBlock($request->all(), $block->blockType);
 
         $block->update($validated);
     }

@@ -6,8 +6,8 @@ import IconChevronDown from '@/components/admin/Icon/IconChevronDown.vue';
 import IconClose from '@/components/admin/Icon/IconClose.vue';
 import IconGrip from '@/components/admin/Icon/IconGrip.vue';
 import Container from '@/components/admin/Ui/Container.vue';
-import { BlockType } from '@/Pages/Admin/Block/Create.vue';
-import { PageForm } from '@/Pages/Admin/Page/Show.vue';
+import type { BlockType } from '@/pages/Admin/Block/Create.vue';
+import type { PageForm } from '@/pages/Admin/Page/Show.vue';
 import { getInputCpt } from '@/utils/mapping';
 
 import type { Block } from '@/types/models/block';
@@ -19,7 +19,7 @@ const props = defineProps<{
     pageForm: InertiaForm<PageForm>;
 }>();
 
-const block = ref<HTMLElement | null>(null);
+const blockRef = ref<HTMLElement | null>(null);
 const isToggle = ref(true);
 
 const removeFromPage = () => {
@@ -59,16 +59,16 @@ const drop = (index: number) => {
 </script>
 
 <template>
-    <Container @dragover.prevent @drop="drop(index)" class="flex flex-col gap-4" ref="block" :aria-expanded="isToggle">
-        <div class="flex items-center gap-2">
+    <Container @dragover.prevent @drop="drop(index)" class="gap-4 flex flex-col" ref="blockRef" :aria-expanded="isToggle">
+        <div class="gap-2 flex items-center">
             <div draggable="true" @dragstart="(e) => dragStart(index, e)" class="cursor-move">
                 <IconGrip />
             </div>
-            <div class="flex items-center gap-2">
+            <div class="gap-2 flex items-center">
                 <span>{{ index + 1 }}</span>
                 <p class="text-xl font-medium">{{ blockType.name }}</p>
             </div>
-            <div class="ml-auto flex gap-2">
+            <div class="gap-2 ml-auto flex">
                 <Action tag="button" variant="icon" @click="isToggle = !isToggle" :class="isToggle ? '' : 'rotate-90'">
                     <span class="sr-only">Toggle block</span>
                     <IconChevronDown />
@@ -79,16 +79,17 @@ const drop = (index: number) => {
             </div>
         </div>
 
-        <dl v-show="isToggle" class="flex flex-col gap-4 overflow-hidden transition-all duration-500 ease-in-out">
-            <template v-for="field in blockType.fields">
+        <!-- Render fields -->
+        <dl v-show="isToggle" class="gap-4 ease-in-out flex flex-col overflow-hidden transition-all duration-500">
+            <template v-for="field in blockType.fields" :key="`block-${index}-${field.name}`">
                 <component
                     :is="getInputCpt(field.type)"
                     :type="field.type"
-                    :name="field.name"
+                    :name="`block-${index}-${field.name}`"
                     :label="field.label"
                     v-model="pageForm.blocks[index].content[field.name]"
                     :repeater-fields="field.repeaterFields"
-                    :error="pageForm.errors[`content.${field.name}`]"
+                    :error="pageForm.errors[`blocks.${index}.content.${field.name}`]"
                     :inline="field.type === 'repeater'"
                 />
             </template>
