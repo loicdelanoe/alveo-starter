@@ -3,6 +3,7 @@ import { ref } from 'vue';
 
 import Modal from '@/components/admin/Modal/Modal.vue';
 import Media from '@/components/admin/Ui/Media.vue';
+import MediaDropdown from '@/components/admin/Ui/MediaDropdown.vue';
 import TheLightbox from '@/components/admin/Ui/TheLightbox.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
 import MediaCreate from '@/Pages/Admin/Media/Create.vue';
@@ -25,7 +26,7 @@ export type MetaData = {
     alt: string;
 };
 
-const props = defineProps<{
+defineProps<{
     medias: Media[];
 }>();
 
@@ -51,19 +52,21 @@ const openLightbox = (index: number) => {
             </Can>
         </template>
 
-        <ul class="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap md:gap-2">
-            <li v-for="(media, index) in medias" :key="media.id" class="aspect-square w-full md:max-w-[12rem]">
+        <MediaDropdown class="h-3/4" v-if="medias.length === 0" />
+
+        <ul v-else class="sm:grid-cols-3 md:flex md:flex-wrap md:gap-2 grid grid-cols-2">
+            <li v-for="(media, index) in medias" :key="media.id" class="md:max-w-[12rem] aspect-square w-full">
                 <div
-                    class="hover:after:bg-secondary-300/30 relative p-2 after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:transition after:content-['']"
+                    class="hover:after:bg-secondary-300/30 p-2 after:inset-0 after:rounded-lg relative after:pointer-events-none after:absolute after:transition after:content-['']"
                 >
-                    <Media class="relative z-2 aspect-square h-full w-full rounded-lg object-cover" :media="media" width="150" height="150" />
+                    <Media class="rounded-lg relative z-2 aspect-square h-full w-full object-cover" :media="media" width="150" height="150" />
 
                     <div class="flex cursor-pointer flex-col">
-                        <span class="max-w-prose truncate font-medium text-ellipsis">{{ media.name }}</span>
-                        <span class="max-w-prose truncate text-sm text-ellipsis">{{ media.type }}</span>
+                        <span class="max-w-prose font-medium truncate text-ellipsis">{{ media.name }}</span>
+                        <span class="max-w-prose text-sm truncate text-ellipsis">{{ media.type }}</span>
                     </div>
 
-                    <button @click="openLightbox(index)" class="absolute inset-0 z-3 cursor-pointer">
+                    <button @click="openLightbox(index)" class="inset-0 absolute z-3 cursor-pointer">
                         <span class="sr-only"> View {{ media.name }}</span>
                     </button>
                 </div>
