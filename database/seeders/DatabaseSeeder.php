@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +15,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(PermissionSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $superAdmin = User::factory()->create([
+            'name' => 'Loïc Delanoë',
+            'email' => 'loic@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('!azerty123'),
+            'remember_token' => Str::random(10),
         ]);
+
+        $superAdmin->assignRole('super-admin');
+
+        $this->call(PageSeeder::class);
+
+        $this->call(BlockTypeSeeder::class);
+
+        $this->call(MenuSeeder::class);
     }
 }

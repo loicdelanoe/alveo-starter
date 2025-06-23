@@ -23,6 +23,18 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash: {
+        success?: string
+        error?: string
+        info?: string
+      }
+      fields: string[]
+      auth: {
+        user: User
+        permissions: string[]
+        roles: string[]
+      }
+      collectionTypes: { id: number; name: string }[]
 };
 
 export interface User {
