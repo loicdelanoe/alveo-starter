@@ -90,8 +90,14 @@ class FileService
     public function uploadFavicon($file)
     {
 
-        // Delete existing favicon directory
-        Storage::disk('public')->deleteDirectory('uploads/favicon');
+        // Delete media favicon if exists
+        $media = Media::where('metadata->is_favicon', true)->first();
+
+        if ($media) {
+            $media->delete();
+            Storage::disk('public')->deleteDirectory('uploads/favicon');
+        }
+
 
         $uuid = Str::uuid();
 
@@ -105,6 +111,7 @@ class FileService
             'type' => $file->getClientMimeType(),
             'metadata' => [
                 'alt' => $file->getClientOriginalName(),
+                'is_favicon' => true,
             ],
         ]);
 

@@ -62,7 +62,7 @@ const onSubmit = () => {
             <section class="gap-2 flex flex-col">
                 <h3 class="font-medium">Favicon</h3>
 
-                <div class="gap-4 border-secondary-300 rounded-lg p-2 flex items-center border">
+                <div class="gap-4 border-secondary-300 rounded-lg py-2 px-4 flex items-center border">
                     <img :src="page.props.settings.favicon" class="w-12" />
 
                     <!-- Favicon preview -->
