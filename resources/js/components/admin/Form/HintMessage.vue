@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-    <span v-if="hint" class="text-sm italic opacity-50">{{ hint }}</span>
+    <span v-if="hint" class="text-sm mt-2 italic opacity-50">{{ hint }}</span>
 </template>
 
 <style scoped></style>
