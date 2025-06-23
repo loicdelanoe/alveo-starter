@@ -82,7 +82,7 @@ watch(isAllSelected, () => {
             </Can>
         </template>
 
-        <div class="mb-4 flex">
+        <div v-if="medias.length" class="mb-4 flex">
             <CheckboxInput class="mr-2" label="Select all" name="select-all" v-model="isAllSelected" />
             <Dropdown class="ml-auto">
                 <button
@@ -95,7 +95,7 @@ watch(isAllSelected, () => {
             </Dropdown>
         </div>
 
-        <MediaDropdown class="h-3/4" v-if="medias.length === 0" />
+        <MediaDropdown class="h-3/4" v-if="!medias.length" />
 
         <ul v-else class="sm:grid-cols-3 md:flex md:flex-wrap md:gap-2 grid grid-cols-2">
             <li v-for="(media, index) in medias" :key="media.id" class="md:max-w-[12rem] aspect-square w-full">
