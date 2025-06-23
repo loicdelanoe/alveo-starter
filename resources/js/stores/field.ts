@@ -1,128 +1,110 @@
-import { InertiaForm } from '@inertiajs/vue3'
-import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
-
-import { fields } from '@/config/fields'
-
-export interface Form {
-  name: string
-  type: string
-  fields: Field[]
-  [key: string]: any
-}
+import { fields } from '@/config/fields';
+import type { InertiaForm } from '@inertiajs/vue3';
+import { defineStore } from 'pinia';
+import { ref, watch } from 'vue';
 
 export interface Field {
-  name: string
-  type: string
-  label: string
-  validation: string[]
-  repeaterFields?: Field[]
-  [key: string]: any
+    name: string;
+    type: string;
+    label: string;
+    validation: string[];
+    repeaterFields?: Field[];
+}
+
+export interface Form {
+    name: string;
+    type: string;
+    fields: Field[];
+    [key: string]: any; // Allow additional properties
 }
 
 interface Errors {
-  name: string
-  type: string
-  label: string
-  [key: string]: string
+    name?: string;
+    type?: string;
+    label?: string;
 }
 
-export const useFieldStore = defineStore('field', () => {
-  const field = ref<Field>({
+const defaultField: Field = {
     name: '',
     type: '',
     label: '',
     validation: [],
-  })
+};
 
-  const errors = ref<Errors>({
-    name: '',
-    type: '',
-    label: '',
-  })
+export const useFieldStore = defineStore('field', () => {
+    const field = ref<Field>({ ...defaultField });
+    const errors = ref<Errors>({});
 
-  // TODO: Improve with more validation rules
-  // Add types validation, if not in the array, return false
-  const isValid = (key: string) => {
-    const value = field.value[key]
+    const resetField = () => {
+        field.value = { ...defaultField };
+        errors.value = {};
+    };
 
-    return value.length > 0
-  }
+    const validate = (): boolean => {
+        let valid = true;
+        errors.value = {};
 
-  const addBasicValidation = (fieldType: string) => {
-    field.value.validation = []
+        if (!field.value.name.trim()) {
+            errors.value.name = 'Name is required';
+            valid = false;
+        }
 
-    // TODO: fix error, when choosing a field type
-    field.value.validation.push(...fields.validation[fieldType])
-  }
+        if (!field.value.type.trim()) {
+            errors.value.type = 'Type is required';
+            valid = false;
+        }
 
-  const pushField = (form: InertiaForm<Form>) => {
-    let hasErrors = false
-    // Add validation
-    Object.entries(field.value).forEach(([key, value]) => {
-      if (!isValid(key)) {
-        errors.value[key] = 'This field is required'
-        hasErrors = true
-      }
-    })
+        if (!field.value.label.trim()) {
+            errors.value.label = 'Label is required';
+            valid = false;
+        }
 
-    if (hasErrors) {
-      return true
-    }
+        return valid;
+    };
 
-    // After validate the field, push it to the form
-    form.fields.push(field.value)
+    const pushField = (form: InertiaForm<Form>): boolean => {
+        if (!validate()) return false;
 
-    // Reset the field
-    resetField()
-  }
+        form.fields.push(JSON.parse(JSON.stringify(field.value))); // deep copy
+        resetField();
+        return true;
+    };
 
-  const resetField = () => {
-    field.value = {
-      name: '',
-      type: '',
-      label: '',
-      validation: [],
-    }
+    const addRepeaterField = (targetField: Field) => {
+        if (!targetField.repeaterFields) {
+            targetField.repeaterFields = [];
+        }
 
-    errors.value = {
-      name: '',
-      type: '',
-      label: '',
-    }
-  }
+        targetField.repeaterFields.push({
+            name: '',
+            type: '',
+            label: '',
+            validation: [],
+        });
+    };
 
-  const addRepeaterField = (field: Field) => {
-    if (!field.repeaterFields) {
-      field.repeaterFields = []
-    }
+    watch(
+        () => field.value.type,
+        (newType) => {
+            if (!newType) return;
 
-    field.repeaterFields.push({
-      name: '',
-      type: '',
-      label: '',
-      validation: [],
-    })
-  }
+            // Reset repeaterFields if not a repeater
+            if (newType !== 'repeater') {
+                delete field.value.repeaterFields;
+            } else {
+                addRepeaterField(field.value);
+            }
 
-  watch(
-    () => field.value.type,
-    newType => {
-      if (!newType) {
-        return
-      }
+            field.value.validation = fields.validation[newType] || [];
+        },
+    );
 
-      if (newType !== 'repeater' && field.value.repeaterFields) {
-        field.value.repeaterFields = []
-      }
-
-      if (newType === 'repeater') {
-        addRepeaterField(field.value)
-      }
-
-      addBasicValidation(newType)
-    }
-  )
-
-  return { field, errors, pushField, resetField }
-})
+    return {
+        field,
+        errors,
+        pushField,
+        resetField,
+        addRepeaterField,
+        validate,
+    };
+});

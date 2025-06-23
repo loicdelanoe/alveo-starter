@@ -10,7 +10,7 @@ import Modal from '@/components/admin/Modal/Modal.vue';
 import Container from '@/components/admin/Ui/Container.vue';
 import { slugify } from '@/components/admin/utils/text';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
-import { Form } from '@/stores/field';
+import { Form, useFieldStore } from '@/stores/field';
 
 const isOpen = ref(false);
 
@@ -19,6 +19,8 @@ const form = useForm<Form>({
     type: '',
     fields: [],
 });
+
+const fieldStore = useFieldStore();
 
 watch(
     () => form.name,
@@ -40,10 +42,10 @@ const removeField = (index: number) => {
                 Create Collection Type
             </Action>
         </template>
-        <form class="flex flex-col gap-4">
+        <form class="gap-4 flex flex-col">
             <section class="mb-8">
                 <h2 class="mb-2 text-xl font-medium">General</h2>
-                <Container class="flex flex-col gap-2 md:flex-row md:gap-4">
+                <Container class="gap-2 md:flex-row md:gap-4 flex flex-col">
                     <InputLabel label="Name" name="name" type="text" v-model="form.name" :error="form.errors.name" />
                     <InputLabel
                         label="Type"
@@ -60,18 +62,27 @@ const removeField = (index: number) => {
             <section class="mb-8">
                 <div class="flex items-center justify-between">
                     <h2 class="mb-2 text-xl font-medium">Fields</h2>
-                    <Modal variant="primary" label="Add Field" title="Add Field" size="xl" v-model="isOpen" position="left" icon="plus">
+                    <Modal
+                        variant="primary"
+                        label="Add Field"
+                        title="Add Field"
+                        size="xl"
+                        v-model="isOpen"
+                        position="left"
+                        icon="plus"
+                        @close-modal="fieldStore.resetField"
+                    >
                         <AsideField :form="form" @close-modal="isOpen = false" />
                     </Modal>
                 </div>
                 <span v-if="form.errors.fields" class="font-medium text-red-500">
                     {{ form.errors.fields }}
                 </span>
-                <ul class="flex flex-col gap-4">
+                <ul class="gap-4 flex flex-col">
                     <li
                         v-for="(field, index) in form.fields"
                         :key="index"
-                        class="border-secondary-200 flex items-center gap-2 rounded-lg border bg-white p-4 font-mono"
+                        class="border-secondary-200 gap-2 rounded-lg bg-white p-4 font-mono flex items-center border"
                     >
                         [{{ field.type }}] {{ field.label }} ({{ field.name }})
                         <Action class="ml-auto" tag="button" :variant="['delete', 'icon']" @click.prevent="removeField(index)">

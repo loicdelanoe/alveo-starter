@@ -15,6 +15,7 @@ const props = defineProps<{
 }>();
 
 const model = defineModel();
+const emit = defineEmits(['closeModal']);
 
 const modalClass = computed(() => {
     return {
@@ -37,7 +38,13 @@ const modalPosition = computed(() => {
 const handleEscape = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
         model.value = false;
+        emit('closeModal');
     }
+};
+
+const close = () => {
+    model.value = false;
+    emit('closeModal');
 };
 
 onMounted(() => document.addEventListener('keydown', handleEscape));
@@ -53,21 +60,21 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape));
 
         <Transition name="slide" :duration="300">
             <Teleport to="body">
-                <div v-if="model" class="fixed inset-0 z-40 flex items-center justify-center bg-black/50" @click.self="model = false">
+                <div v-if="model" class="inset-0 bg-black/50 fixed z-40 flex items-center justify-center" @click.self="close">
                     <div
-                        class="modal absolute z-20 m-3 flex w-full flex-col gap-8 overflow-auto rounded-lg bg-white px-6 py-10"
+                        class="modal m-3 gap-8 rounded-lg bg-white px-6 py-10 absolute z-20 flex w-full flex-col overflow-auto"
                         :class="[modalClass, modalPosition]"
                     >
                         <div class="flex w-full items-center justify-between">
                             <h2 class="text-2xl font-medium">{{ title }}</h2>
-                            <div class="flex gap-4">
+                            <div class="gap-4 flex">
                                 <slot name="action" />
-                                <Action tag="button" class="" variant="icon" @click="model = false">
+                                <Action tag="button" class="" variant="icon" @click="close">
                                     <IconClose />
                                 </Action>
                             </div>
                         </div>
-                        <div class="overflow-auto px-1 py-1">
+                        <div class="px-1 py-1 overflow-auto">
                             <slot />
                         </div>
                         <slot name="footer" />
