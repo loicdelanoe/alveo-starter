@@ -3,6 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
+import LinkFormPage from '@/components/admin/Form/LinkFormPage.vue';
 import Block from '@/components/admin/Form/Page/Block.vue';
 import MultiBlockAdd from '@/components/admin/Form/Page/MultiBlockAdd.vue';
 import MultiBlockCreate from '@/components/admin/Form/Page/MultiBlockCreate.vue';
@@ -21,8 +22,6 @@ import PanelLayout from '@/Layouts/PanelLayout.vue';
 import { Page } from '@/types/models/page';
 import { deleteItem } from '@/utils/utils';
 
-import CheckboxInput from '@/components/admin/Form/CheckboxInput.vue';
-import IconClose from '@/components/admin/Icon/IconClose.vue';
 import type { BlockType } from '@/Pages/Admin/Block/Create.vue';
 import type { Block as TBlock } from '@/types/models/block';
 import type { Form } from '@/types/models/form';
@@ -74,7 +73,6 @@ const isHome = page.is_home;
 
 const createBlockModal = ref(false);
 const existingBlockModal = ref(false);
-const formsModal = ref(false);
 
 const tab = ref(0);
 const tabs = [
@@ -99,8 +97,12 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
     value: pageProps.collectionTypes[key],
 }));
 
-const removeForm = (index: number) => {
+const handleRemoveForm = (index: number) => {
     form.forms.splice(index, 1);
+};
+
+const handleAddForm = (forms: Form[]) => {
+    form.forms.push(...forms);
 };
 </script>
 
@@ -220,48 +222,7 @@ const removeForm = (index: number) => {
                     </Container>
 
                     <!-- Forms -->
-                    <Container class="gap-4 flex flex-col">
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">Link Forms</span>
-                            <Modal
-                                variant="outline"
-                                size="2xl"
-                                label="Add Forms"
-                                title="Add Forms"
-                                position="left"
-                                icon="plus"
-                                subtitle="Select forms to link with this page"
-                                v-model="formsModal"
-                            >
-                                <div class="gap-4 flex flex-col">
-                                    <ul class="gap-2 flex flex-col">
-                                        <li v-for="formItem in forms" :key="formItem.id" class="gap-2 flex items-center">
-                                            <CheckboxInput
-                                                :label="formItem.name"
-                                                :name="`formItem-${formItem.id}`"
-                                                :value="formItem"
-                                                v-model="form.forms"
-                                                transparent
-                                            />
-                                        </li>
-                                    </ul>
-
-                                    <Action tag="button" variant="primary" @click="formsModal = false">Add Form(s)</Action>
-                                </div>
-                            </Modal>
-                        </div>
-
-                        <ul v-if="form.forms.length" class="gap-2 flex flex-col">
-                            <Container v-for="(formItem, index) in form.forms" :key="formItem.id" class="flex items-center justify-between">
-                                {{ formItem.name }}
-
-                                <Action tag="button" variant="icon" @click="removeForm(index)">
-                                    <span class="sr-only">Remove Form</span>
-                                    <IconClose />
-                                </Action>
-                            </Container>
-                        </ul>
-                    </Container>
+                    <LinkFormPage @remove-form="handleRemoveForm" @add-forms="handleAddForm" :form="form" :forms="forms" />
                 </section>
             </div>
 

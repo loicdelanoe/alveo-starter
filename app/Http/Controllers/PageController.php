@@ -36,8 +36,9 @@ class PageController extends Controller
     {
         $blocks = Block::all();
         $blockTypes = BlockType::all();
+        $forms = Form::all();
 
-        return Inertia::render('Admin/Page/Create', compact('blocks', 'blockTypes'));
+        return Inertia::render('Admin/Page/Create', compact('blocks', 'blockTypes', 'forms'));
     }
 
     /**

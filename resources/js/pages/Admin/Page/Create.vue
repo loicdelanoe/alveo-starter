@@ -2,8 +2,8 @@
 import { useForm, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
-import { ExtendedPageProps } from '@/components/admin/Form/AsideField.vue';
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
+import LinkFormPage from '@/components/admin/Form/LinkFormPage.vue';
 import Block from '@/components/admin/Form/Page/Block.vue';
 import MultiBlockAdd from '@/components/admin/Form/Page/MultiBlockAdd.vue';
 import MultiBlockCreate from '@/components/admin/Form/Page/MultiBlockCreate.vue';
@@ -22,6 +22,7 @@ import { BlockType } from '../Block/Create.vue';
 import { PageForm } from './Show.vue';
 
 import type { Block as TBlock } from '@/types/models/block';
+import { Form } from '@/types/models/form';
 
 const tabs = [
     { name: 'General', id: 0 },
@@ -30,7 +31,7 @@ const tabs = [
 ];
 const status = ['draft', 'published'];
 
-const pageProps = usePage<ExtendedPageProps>().props;
+const pageProps = usePage().props;
 
 const draggedIndex = ref<number | null>(null);
 
@@ -41,6 +42,7 @@ const existingBlockModal = ref(false);
 defineProps<{
     blocks: TBlock[];
     blockTypes: BlockType[];
+    forms: Form[];
 }>();
 
 const form = useForm<PageForm>({
@@ -53,6 +55,7 @@ const form = useForm<PageForm>({
     blocks: [] as TBlock[],
     is_archive: false,
     collection_type_id: null,
+    forms: [] as Form[],
 });
 
 const onSubmit = () => {
@@ -77,6 +80,14 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
     label: key,
     value: pageProps.collectionTypes[key],
 }));
+
+const handleRemoveForm = (index: number) => {
+    form.forms.splice(index, 1);
+};
+
+const handleAddForm = (forms: Form[]) => {
+    form.forms.push(...forms);
+};
 </script>
 
 <template>
@@ -85,13 +96,13 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
             <Breadcrumbs :links="breadcrumbs" />
         </template>
         <div>
-            <div class="relative grid grid-cols-1 gap-5 md:flex-row lg:grid-cols-3">
-                <div class="flex w-full flex-col lg:col-span-2">
+            <div class="gap-5 md:flex-row lg:grid-cols-3 relative grid grid-cols-1">
+                <div class="lg:col-span-2 flex w-full flex-col">
                     <TabsHead :tabs="tabs" v-model="tab" />
                     <!-- General -->
                     <!-- Title and Slug -->
-                    <div v-show="tab === 0" class="flex w-full flex-col gap-6">
-                        <Container tag="section" class="flex flex-col gap-4 md:flex-row">
+                    <div v-show="tab === 0" class="gap-6 flex w-full flex-col">
+                        <Container tag="section" class="gap-4 md:flex-row flex flex-col">
                             <h3 class="sr-only">General</h3>
                             <InputLabel label="Title" name="title" type="text" v-model="form.title" :error="form.errors.title" />
                             <div class="w-full">
@@ -108,7 +119,7 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                         <!-- Blocks -->
                         <section>
                             <h3 class="mb-2 text-2xl font-medium">Blocks</h3>
-                            <div class="mb-4 flex flex-col gap-4">
+                            <div class="mb-4 gap-4 flex flex-col">
                                 <template v-for="(block, index) in form.blocks" :key="block.id">
                                     <Block
                                         :index="index"
@@ -119,7 +130,7 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                                     />
                                 </template>
                             </div>
-                            <div class="flex gap-4">
+                            <div class="gap-4 flex">
                                 <Modal
                                     variant="primary"
                                     size="lg"
@@ -145,8 +156,8 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                     </div>
 
                     <!-- SEO -->
-                    <Container tag="section" v-show="tab === 1" class="flex flex-col gap-4">
-                        <h3 class="sr-only text-xl font-medium">SEO</h3>
+                    <Container tag="section" v-show="tab === 1" class="gap-4 flex flex-col">
+                        <h3 class="text-xl font-medium sr-only">SEO</h3>
                         <InputLabel label="Meta title" name="meta_title" type="text" v-model="form.meta_title" :error="form.errors.meta_title" />
                         <TextAreaInput
                             label="Meta description"
@@ -159,8 +170,10 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                     </Container>
 
                     <!-- Settings -->
-                    <section v-show="tab === 2" class="flex flex-col gap-4">
+                    <section v-show="tab === 2" class="gap-4 flex flex-col">
                         <h3 class="sr-only">Settings</h3>
+
+                        <!-- Collections -->
                         <Container>
                             <ToggleInput label="Define as archive page" name="is_archive" v-model="form.is_archive" reverse />
                             <SelectInput
@@ -172,10 +185,13 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                                 class="mt-4"
                             />
                         </Container>
+
+                        <!-- Forms -->
+                        <LinkFormPage @remove-form="handleRemoveForm" @add-forms="handleAddForm" :form="form" :forms="forms" />
                     </section>
                 </div>
                 <!-- Status -->
-                <Container tag="aside" class="flex w-full flex-col gap-2 self-start md:sticky md:top-7">
+                <Container tag="aside" class="gap-2 md:sticky md:top-7 flex w-full flex-col self-start">
                     <h3 class="sr-only">Aside</h3>
                     <SelectInput name="status" label="Status" :options="status" v-model="form.status" />
                     <Action tag="button" @click="onSubmit" variant="primary">

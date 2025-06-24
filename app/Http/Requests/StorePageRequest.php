@@ -33,6 +33,7 @@ class StorePageRequest extends FormRequest
             'og_type' => 'nullable|string|in:article,website,product,video,book,profile,place,event',
             'is_archive' => 'boolean',
             'collection_type_id' => 'nullable|exists:collection_types,id|integer',
+            'forms' => 'nullable|array',
         ];
     }
 }
