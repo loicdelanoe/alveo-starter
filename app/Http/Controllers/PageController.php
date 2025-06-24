@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatePageRequest;
 use App\Models\Block;
 use App\Models\BlockType;
 use App\Models\Page;
+use App\Service\PageService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -45,32 +46,7 @@ class PageController extends Controller
     {
         $validated = $request->validated();
 
-        $pageData = collect($validated)->except('blocks')->toArray();
-
-        $pageData = collect($validated)->except('blocks')->toArray();
-
-        $types = collect($validated['blocks'])->map(function ($block) {
-            return Block::find($block['id'])->blockType;
-        })->all();
-
-        $this->validateAllBlocks($validated, $types);
-
-        $page = Page::create($pageData);
-
-        // Update blocks
-        foreach ($validated['blocks'] as $validatedBlock) {
-            $block = Block::findOrFail($validatedBlock['id']);
-
-            $block->update([
-                'content' => $validatedBlock['content'],
-            ]);
-        }
-
-        $blocks = collect($validated['blocks'])->mapWithKeys(function (array $block, int $key) {
-            return [$block['id'] => ['order' => $key]];
-        });
-
-        $page->blocks()->attach($blocks);
+        $page = (new PageService)->storePage($validated);
 
         return to_route('admin.page.show', $page)->with('success', 'Page created successfully.');
     }
@@ -83,8 +59,6 @@ class PageController extends Controller
         $page->load('blocks');
         $blocks = Block::all();
         $blockTypes = BlockType::all();
-
-        // $this->hydratePage($page);
 
         return Inertia::render('Admin/Page/Show', compact('page', 'blocks', 'blockTypes'));
     }
@@ -104,31 +78,7 @@ class PageController extends Controller
     {
         $validated = $request->validated();
 
-        $pageData = collect($validated)->except('blocks')->toArray();
-
-        $types = collect($validated['blocks'])->map(function ($block) {
-            return Block::find($block['id'])->blockType;
-        })->all();
-
-        $this->validateAllBlocks($validated, $types);
-
-        $page->update($pageData);
-
-        // Update blocks
-        foreach ($validated['blocks'] as $validatedBlock) {
-            $block = Block::findOrFail($validatedBlock['id']);
-
-            $block->update([
-                'content' => $validatedBlock['content'],
-            ]);
-        }
-
-        // Sync blocks with page
-        $sections = collect($validated['blocks'])->mapWithKeys(function (array $block, int $key) {
-            return [$block['id'] => ['order' => $key]];
-        });
-
-        $page->blocks()->sync($sections);
+        $page = (new PageService)->updatePage($validated, $page);
 
         return to_route('admin.page.show', $page)->with('success', 'Page updated successfully.');
     }
