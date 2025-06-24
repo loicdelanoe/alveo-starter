@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { getBlockCpt } from '@/alveo/blockRegistry';
 import { Menu } from '@/types/models/menu';
 import { Page } from '@/types/models/page';
 import { Head, usePage } from '@inertiajs/vue3';
-import type { Component } from 'vue';
-import { computed, defineAsyncComponent } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps<{
     page: Page;
@@ -29,17 +27,8 @@ const title = computed(() => `${props.page.title} - ${pageProps.settings.site_na
     <h1 class="sr-only">{{ title }}</h1>
 
     <main class="flex flex-col">
-        <Suspense>
-            <component
-                v-for="block in page.blocks"
-                :key="block.id"
-                :is="defineAsyncComponent(() => getBlockCpt(block.block_type.type) as Promise<Component>)"
-                :content="block.content"
-                :collections="page.collections"
-            />
-        </Suspense>
+        <slot />
     </main>
-    <slot />
 </template>
 
 <style scoped></style>

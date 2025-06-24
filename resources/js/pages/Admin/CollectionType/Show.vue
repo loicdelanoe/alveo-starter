@@ -40,7 +40,7 @@ const tableCol = props.collectionType.fields.map((field) => {
         </template>
         <div>
             <Table
-                :columns="['Title', ...tableCol, 'Created at', 'Updated at']"
+                :columns="['Status', 'Title', ...tableCol, 'Created at', 'Updated at']"
                 :collection-name="collectionType.type"
                 data-name="collection"
                 :column-link="[collectionType.type, 'slug']"
