@@ -20,8 +20,8 @@ const model = defineModel();
 </script>
 
 <template>
-    <div class="z-2 flex items-center" :class="{ 'flex-row-reverse': reverse, 'flex-col-reverse items-start justify-end': col }" v-bind="$attrs">
-        <div class="mt-1 relative">
+    <div class="flex items-center" :class="{ 'flex-row-reverse': reverse, 'flex-col-reverse items-start justify-end': col }" v-bind="$attrs">
+        <div class="mt-1 relative z-5">
             <input
                 type="checkbox"
                 :id="name"

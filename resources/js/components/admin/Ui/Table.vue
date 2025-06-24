@@ -75,6 +75,9 @@ const getColumn = (item: any, column: string) => {
     return item[column];
 };
 
+console.log(props.collectionName);
+
+
 const bulkDelete = () => {
     if (bulkActionsForm.selected.length === 0) {
         return;
