@@ -61,42 +61,50 @@ const links = [
             <Breadcrumbs :links="links" />
         </template>
 
-        <div class="relative grid grid-cols-1 gap-5 lg:grid-cols-3">
-            <div class="flex flex-col lg:col-span-2">
+        <pre>{{ form }}</pre>
+
+        <div class="gap-5 lg:grid-cols-3 relative grid grid-cols-1">
+            <div class="lg:col-span-2 flex flex-col">
                 <TabsHead :tabs="tabs" v-model="tab" />
 
                 <!-- General -->
                 <!-- Title and Slug -->
-                <div v-show="tab === 0" class="flex w-full flex-col gap-6">
-                    <Container tag="section" class="flex flex-col gap-4 md:flex-row">
+                <div v-show="tab === 0" class="gap-6 flex w-full flex-col">
+                    <Container tag="section" class="gap-4 md:flex-row flex flex-col">
                         <h3 class="sr-only">General</h3>
                         <InputLabel label="Title" name="title" type="text" v-model="form.title" :error="form.errors.title" />
                         <InputLabel label="Slug" name="slug" type="text" v-model="form.slug" :error="form.errors.slug" hint="A unique identifier" />
                     </Container>
 
                     <!-- Fields -->
-                    <Container tag="section" class="flex flex-col gap-4">
+                    <Container tag="section" class="gap-4 flex flex-col">
                         <h3 class="mb-2 text-2xl font-medium">Fields</h3>
-                        <div v-for="field in collectionType.fields" class="flex flex-col gap-4" :key="JSON.stringify(field)">
+                        <div v-for="field in collectionType.fields" class="gap-4 flex flex-col" :key="JSON.stringify(field)">
                             <FieldBuilder :field="field" :form="form" />
                         </div>
                     </Container>
                 </div>
 
                 <!-- SEO -->
-                <Container v-show="tab === 1" tag="section" class="flex flex-col gap-4">
-                    <h3 class="sr-only text-xl font-medium">SEO</h3>
-                    <InputLabel label="Meta title" name="meta_title" type="text" v-model="form.meta_title" />
-                    <TextAreaInput label="Meta description" name="meta_description" type="text" v-model="form.meta_description" />
-                    <InputLabel label="Open Graph type" name="og_type" type="text" v-model="form.og_type" />
+                <Container v-show="tab === 1" tag="section" class="gap-4 flex flex-col">
+                    <h3 class="text-xl font-medium sr-only">SEO</h3>
+                    <InputLabel label="Meta title" name="meta_title" type="text" v-model="form.meta_title" :error="form.errors.meta_title" />
+                    <TextAreaInput
+                        label="Meta description"
+                        name="meta_description"
+                        type="text"
+                        v-model="form.meta_description"
+                        :error="form.errors.meta_description"
+                    />
+                    <InputLabel label="Open Graph type" name="og_type" type="text" v-model="form.og_type" :error="form.errors.og_type" />
                 </Container>
             </div>
 
             <!-- Status -->
-            <Container tag="aside" class="flex w-full flex-col gap-2 self-start lg:sticky lg:top-7">
+            <Container tag="aside" class="gap-2 lg:sticky lg:top-7 flex w-full flex-col self-start">
                 <h3 class="sr-only">Aside</h3>
-                <SelectInput name="status" label="Status" :options="status" v-model="form.status" />
-                <Action tag="Link" @click="onSubmit" variant="primary" type="button"> Save </Action>
+                <SelectInput name="status" label="Status" :options="status" v-model="form.status" :error="form.errors.status" />
+                <Action tag="button" @click="onSubmit" variant="primary"> Save </Action>
             </Container>
         </div>
     </PanelLayout>

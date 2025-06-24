@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Concerns\hasDynamicValidation;
+use App\Http\Requests\StoreCollectionRequest;
+use App\Http\Requests\UpdateCollectionRequest;
 use App\Models\Collection;
 use App\Models\CollectionType;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CollectionController extends Controller
@@ -34,25 +35,15 @@ class CollectionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, CollectionType $collectionType)
+    public function store(StoreCollectionRequest $request, CollectionType $collectionType)
     {
-        $validated = $this->validateBlock($request, $collectionType);
+        $validated = $request->validated();
 
-        // TODO: make a request file for this
-        $basicValidated = $request->validate([
-            'status' => 'required',
-            'title' => 'required',
-            'slug' => 'required',
-            'meta_description' => 'nullable',
-            'meta_title' => 'nullable',
-            'og_type' => 'nullable',
-        ]);
+        $this->validateBlock($validated, $collectionType);
 
         $validated['collection_type_id'] = $collectionType->id;
 
-        $finalValidated = array_merge($basicValidated, $validated);
-
-        $collection = Collection::create($finalValidated);
+        $collection = Collection::create($validated);
 
         return to_route('admin.collection.show', [
             'collectionType' => $collectionType->type,
@@ -76,13 +67,18 @@ class CollectionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CollectionType $collectionType, Collection $collection)
+    public function update(UpdateCollectionRequest $request, CollectionType $collectionType, Collection $collection)
     {
-        // dd($request->all(), $collectionType, $collection);
+        $validated = $request->validated();
 
-        $collection->update($request->all());
+        $this->validateBlock($validated, $collectionType);
 
-        return to_route('admin.collection.show', [$collectionType, $collection]);
+        $collection->update($validated);
+
+        return to_route('admin.collection.show', [
+            'collectionType' => $collectionType->type,
+            'collection' => $collection->slug,
+        ])->with('success', 'Collection created successfully');
     }
 
     /**
