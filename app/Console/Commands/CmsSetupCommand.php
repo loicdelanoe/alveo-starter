@@ -16,7 +16,7 @@ class CmsSetupCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'cms:setup';
+    protected $signature = 'alveo:setup';
 
     /**
      * The console command description.

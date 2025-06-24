@@ -12,7 +12,7 @@ class Block extends Command
      *
      * @var string
      */
-    protected $signature = 'cms:block {name}';
+    protected $signature = 'alveo:block {name}';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class Block extends Command
      */
     public function handle()
     {
-        $path = resource_path("js/Components/Blocks/{$this->argument('name')}.vue");
+        $path = resource_path("js/components/blocks/{$this->argument('name')}.vue");
 
         $fileContent = <<<'EOT'
         <script setup lang="ts">
@@ -36,7 +36,7 @@ class Block extends Command
         </script>
 
         <template>
-            <section></section>
+            <pre>{{ content }}</pre>
         </template>
 
         <style scoped></style>
@@ -49,7 +49,7 @@ class Block extends Command
         $written = File::put($path, $fileContent);
 
         if ($written) {
-            $this->info('Created new Block '.$this->argument('name').' in resources/js/Components/Blocks');
+            $this->info('Created new Block '.$this->argument('name').' in resources/js/components/blocks');
         } else {
             $this->error('Failed to create block.');
         }
