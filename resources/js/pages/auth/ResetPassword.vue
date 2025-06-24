@@ -1,37 +1,38 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+// import InputError from '@/components/InputError.vue';
+// import { Button } from '@/components/ui/button';
+// import { Input } from '@/components/ui/input';
+// import { Label } from '@/components/ui/label';
+// import AuthLayout from '@/layouts/AuthLayout.vue';
+// import { Head, useForm } from '@inertiajs/vue3';
+// import { LoaderCircle } from 'lucide-vue-next';
 
-interface Props {
-    token: string;
-    email: string;
-}
+// interface Props {
+//     token: string;
+//     email: string;
+// }
 
-const props = defineProps<Props>();
+// const props = defineProps<Props>();
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
-});
+// const form = useForm({
+//     token: props.token,
+//     email: props.email,
+//     password: '',
+//     password_confirmation: '',
+// });
 
-const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => {
-            form.reset('password', 'password_confirmation');
-        },
-    });
-};
+// const submit = () => {
+//     form.post(route('password.store'), {
+//         onFinish: () => {
+//             form.reset('password', 'password_confirmation');
+//         },
+//     });
+// };
 </script>
 
 <template>
-    <AuthLayout title="Reset password" description="Please enter your new password below">
+    <div></div>
+    <!-- <AuthLayout title="Reset password" description="Please enter your new password below">
         <Head title="Reset password" />
 
         <form @submit.prevent="submit">
@@ -77,5 +78,5 @@ const submit = () => {
                 </Button>
             </div>
         </form>
-    </AuthLayout>
+    </AuthLayout> -->
 </template>

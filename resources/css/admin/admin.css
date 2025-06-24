@@ -4,6 +4,8 @@
 @import "./components/button.css";
 @import '../app.css';
 
+@source "../../js/components/blocks";
+
 :root {
     --bg-body: #F8F8F8;
 

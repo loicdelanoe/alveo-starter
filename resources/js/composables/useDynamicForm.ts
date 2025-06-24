@@ -1,7 +1,7 @@
 // composables/useDynamicForm.ts
 import type { Form as FormType } from '@/types/models/form';
 import { router, usePage } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import { reactive, Ref, ref } from 'vue';
 
 /**
  * useDynamicForm is a composable function that manages a dynamic form based on a given form definition.
@@ -20,7 +20,9 @@ export function useDynamicForm(
     };
     onSubmit: () => void;
     errors: Record<string, any>;
+    showMessage: Ref<boolean>;
 } {
+    const showMessage = ref(false);
     // Initialize reactive form state with empty strings for all fields
     const form = reactive(Object.fromEntries(formDefinition.fields.map((field) => [field.name, ''])));
 
@@ -28,14 +30,18 @@ export function useDynamicForm(
 
     // Submit function: sends form data to the Laravel route named 'form.submit'
     const onSubmit = () => {
+        console.log('showMessage before', showMessage.value);
+
         return router.post(route('form.submit', formDefinition.slug), form, {
             errorBag,
+            only: ['form', 'errors'],
             onSuccess: () => {
-                // Reset form fields on success
                 Object.keys(form).forEach((key) => (form[key] = ''));
+
+                showMessage.value = true;
             },
         });
     };
 
-    return { form, onSubmit, errors };
+    return { form, onSubmit, errors, showMessage };
 }
