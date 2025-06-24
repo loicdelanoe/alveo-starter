@@ -21,7 +21,7 @@ class Setting extends Model
         return static::firstOrCreate([], [
             'site_name' => config('app.name', 'Alveo'),
             'site_description' => null,
-            'favicon' => null,
+            'favicon' => '/favicon.ico',
         ]);
     }
 }

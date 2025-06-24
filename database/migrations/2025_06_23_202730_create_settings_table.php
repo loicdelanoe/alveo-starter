@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('site_name')->default('Alveo');
             $table->string('site_description')->nullable();
-            $table->text('favicon')->default('/favicon.svg')->nullable();
+            $table->string('favicon')->default('/favicon.svg');
             $table->timestamps();
         });
     }
