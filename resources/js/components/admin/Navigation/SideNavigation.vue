@@ -20,6 +20,7 @@ import CollapseButton from '@/components/admin/Ui/CollpaseButton.vue';
 import { useSidebarStore } from '@/stores/sidebar';
 
 import Alveo from '../Icon/Alveo.vue';
+import IconForm from '../Icon/IconForm.vue';
 import IconPlus from '../Icon/IconPlus.vue';
 import IconSquareArrowRight from '../Icon/IconSquareArrowRight.vue';
 
@@ -87,6 +88,12 @@ const user = computed(() => page.props.auth.user);
             </NavigationGroup>
 
             <NavigationGroup title="Content">
+                <li>
+                    <NavigationItem :href="route('admin.form.index')">
+                        <IconForm />
+                        <span>Forms</span>
+                    </NavigationItem>
+                </li>
                 <Can permission="show pages">
                     <li>
                         <NavigationItem :href="route('admin.page.index')">

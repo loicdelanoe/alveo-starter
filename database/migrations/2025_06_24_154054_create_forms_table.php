@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('forms', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->json('fields');
+            $table->string('route');
+            $table->string('method')->default('POST');
+            $table->text('sucesss_message')->nullable();
             $table->timestamps();
         });
     }

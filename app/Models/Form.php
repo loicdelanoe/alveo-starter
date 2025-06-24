@@ -9,4 +9,13 @@ class Form extends Model
 {
     /** @use HasFactory<\Database\Factories\FormFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'fields',
+        'route',
+        'method',
+        'success_message',
+    ];
 }
