@@ -7,7 +7,6 @@
 /storage/*.key
 /storage/pail
 /vendor
-/resources/js/components/blocks
 .env
 .env.backup
 .env.production
@@ -23,3 +22,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Alveo
+/resources/js/components/blocks
+/resources/js/components/collections
