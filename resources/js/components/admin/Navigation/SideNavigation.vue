@@ -88,12 +88,6 @@ const user = computed(() => page.props.auth.user);
             </NavigationGroup>
 
             <NavigationGroup title="Content">
-                <li>
-                    <NavigationItem :href="route('admin.form.index')">
-                        <IconForm />
-                        <span>Forms</span>
-                    </NavigationItem>
-                </li>
                 <Can permission="show pages">
                     <li>
                         <NavigationItem :href="route('admin.page.index')">
@@ -102,6 +96,12 @@ const user = computed(() => page.props.auth.user);
                         </NavigationItem>
                     </li>
                 </Can>
+                <li>
+                    <NavigationItem :href="route('admin.form.index')">
+                        <IconForm />
+                        <span>Forms</span>
+                    </NavigationItem>
+                </li>
                 <Can permission="show collections">
                     <li>
                         <CollapseButton label="Collections" has-create>

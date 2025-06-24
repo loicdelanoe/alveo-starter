@@ -18,4 +18,8 @@ class Form extends Model
         'method',
         'success_message',
     ];
+
+    protected $casts = [
+        'fields' => 'json',
+    ];
 }

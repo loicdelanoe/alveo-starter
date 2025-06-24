@@ -32,5 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(BlockTypeSeeder::class);
 
         $this->call(MenuSeeder::class);
+
+        $this->call(FormSeeder::class);
     }
 }

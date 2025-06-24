@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->json('fields');
-            $table->string('route');
-            $table->string('method')->default('POST');
-            $table->text('sucesss_message')->nullable();
+            $table->text('success_message')->nullable();
             $table->timestamps();
         });
     }
