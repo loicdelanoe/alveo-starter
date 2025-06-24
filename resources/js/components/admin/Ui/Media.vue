@@ -6,7 +6,7 @@ import ErrorMessage from '@/components/admin/Form/ErrorMessage.vue';
 import IconFile from '@/components/admin/Icon/IconFile.vue';
 import ResponsiveImage from '@/components/admin/Ui/ResponsiveImage.vue';
 
-import type { Media } from '@/Pages/Admin/Media/Index.vue';
+import type { Media } from '@/pages/Admin/Media/Index.vue';
 
 const props = defineProps<{
     media: Media | string;
@@ -64,7 +64,7 @@ const isVideo = computed(() => {
         <video v-else-if="isVideo" v-bind="$attrs">
             <source :src="currentMedia.path" :type="currentMedia.type" />
         </video>
-        <div v-else class="bg-secondary-200 flex aspect-square items-center justify-center p-12" v-bind="$attrs">
+        <div v-else class="bg-secondary-200 p-12 flex aspect-square items-center justify-center" v-bind="$attrs">
             <IconFile width="w-19 h-19" stroke-width="1" />
         </div>
     </template>
