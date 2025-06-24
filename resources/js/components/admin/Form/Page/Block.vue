@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <script setup lang="ts">
 import { InertiaForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -37,7 +38,7 @@ const dragStart = (index: number, event: DragEvent) => {
     // Set it as the drag image
     if (event.dataTransfer && nodeElement) {
         event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setDragImage(nodeElement.parentNode, 0, 0);
+        event.dataTransfer.setDragImage(nodeElement.parentNode as Element, 0, 0);
     }
 };
 
@@ -56,21 +57,37 @@ const drop = (index: number) => {
         draggedIndex.value = null;
     }
 };
+
+const dragEnd = () => {
+    draggedIndex.value = null;
+};
 </script>
 
 <template>
-    <Container @dragover.prevent @drop="drop(index)" class="gap-4 flex flex-col" ref="blockRef" :aria-expanded="isToggle">
+    <Container @dragover.prevent @drop="drop(index)" class="gap-4 flex flex-col transition" ref="blockRef" :aria-expanded="isToggle">
+        <!-- Header -->
         <div class="gap-2 flex items-center">
-            <div draggable="true" @dragstart="(e) => dragStart(index, e)" class="cursor-move">
+            <!-- Drag handle -->
+            <div draggable="true" @dragstart="(e) => dragStart(index, e)" @dragend="dragEnd" class="cursor-move">
                 <IconGrip />
             </div>
+
+            <!-- Block info -->
             <div class="gap-2 flex items-center">
                 <span>{{ index + 1 }}</span>
                 <p class="text-xl font-medium">{{ blockType.name }}</p>
             </div>
+
+            <!-- Actions -->
             <div class="gap-2 ml-auto flex">
-                <Action tag="button" variant="icon" @click="isToggle = !isToggle" :class="isToggle ? '' : 'rotate-90'">
-                    <span class="sr-only">Toggle block</span>
+                <Action
+                    tag="button"
+                    variant="icon"
+                    @click="isToggle = !isToggle"
+                    :class="isToggle ? '' : 'rotate-90'"
+                    :aria-label="isToggle ? 'Collapse block' : 'Expand block'"
+                >
+                    <span class="sr-only">{{ isToggle ? 'Collapse block' : 'Expand block' }}</span>
                     <IconChevronDown />
                 </Action>
                 <Action @click="removeFromPage" tag="button" variant="icon">
@@ -79,7 +96,7 @@ const drop = (index: number) => {
             </div>
         </div>
 
-        <!-- Render fields -->
+        <!-- Fields -->
         <dl v-show="isToggle" class="gap-4 ease-in-out flex flex-col overflow-hidden transition-all duration-500">
             <template v-for="field in blockType.fields" :key="`block-${index}-${field.name}`">
                 <component

@@ -15,7 +15,7 @@ import Breadcrumbs from '@/components/admin/Ui/Breadcrumbs.vue';
 import Container from '@/components/admin/Ui/Container.vue';
 import Draggable from '@/components/admin/Ui/Draggable.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
-import ActionCreate from '@/Pages/Admin/Action/Create.vue';
+import ActionCreate from '@/pages/Admin/Action/Create.vue';
 import { deleteItem } from '@/utils/utils';
 
 import type { Menu } from '@/types/models/menu';
@@ -95,15 +95,15 @@ const addPages = () => {
             </Can>
         </template>
 
-        <div class="flex flex-col gap-6">
-            <Container class="flex flex-col gap-4 md:flex-row md:gap-6">
+        <div class="gap-6 flex flex-col">
+            <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
                 <InputLabel label="Name" name="name" type="text" v-model="form.name" :error="form.errors.name" />
                 <InputLabel label="Slug" name="slug" type="text" v-model="form.slug" :error="form.errors.slug" hint="A unique identifier" />
             </Container>
 
             <!-- Pages -->
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <section class="flex flex-col gap-4">
+            <div class="gap-4 md:grid-cols-2 grid grid-cols-1">
+                <section class="gap-4 flex flex-col">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl font-medium">Pages</h2>
                         <Can permission="edit menus">
@@ -124,7 +124,7 @@ const addPages = () => {
                                             :name="`page-${page.id}`"
                                             :value="page.id"
                                             v-model="selectedPages"
-                                            class="page-checkbox w-full cursor-pointer pl-3"
+                                            class="page-checkbox pl-3 w-full cursor-pointer"
                                         />
                                     </li>
                                 </ul>
@@ -140,9 +140,16 @@ const addPages = () => {
                     </div>
 
                     <!-- Drag n Drop -->
-                    <ul class="flex flex-col gap-2">
+                    <ul class="gap-2 flex flex-col">
                         <li v-for="(page, index) in formattedFormPages" :key="page.id">
-                            <Draggable :index="index" :pos-x="20" :pos-y="25" v-model="form.pages" v-model:dragged="draggedIndex">
+                            <Draggable
+                                :class="{ 'opacity-0': draggedIndex === index }"
+                                :index="index"
+                                :pos-x="20"
+                                :pos-y="25"
+                                v-model="form.pages"
+                                v-model:dragged="draggedIndex"
+                            >
                                 {{ page.title }}
                                 <Action tag="button" variant="icon" class="ml-auto" @click="removeFromMenu(index)">
                                     <IconClose />
@@ -151,14 +158,14 @@ const addPages = () => {
                         </li>
                     </ul>
                 </section>
-                <section class="flex flex-col gap-4">
-                    <div class="flex items-center justify-between gap-2">
+                <section class="gap-4 flex flex-col">
+                    <div class="gap-2 flex items-center justify-between">
                         <h3 class="text-xl font-medium">Actions</h3>
                         <Modal label="Add Action" title="Add Action" variant="primary" size="xl" position="left" icon="plus" v-model="actionModal">
                             <ActionCreate :menu-form="form" :menu-id="menu.id" @close-modal="actionModal = false" />
                         </Modal>
                     </div>
-                    <ul class="flex flex-col gap-2">
+                    <ul class="gap-2 flex flex-col">
                         <li v-for="(action, index) in menu.actions" :key="action.id">
                             <MenuAction :action="action" :index="index" />
                         </li>

@@ -26,21 +26,23 @@ const dragStart = (index: number, event: DragEvent) => {
     }
 };
 
-const drop = (index: number) => {
-    if (draggedIndex.value !== null && model.value) {
-        const temp = model.value[draggedIndex.value];
-
-        model.value.splice(draggedIndex.value, 1);
-        model.value.splice(index, 0, temp);
-
-        draggedIndex.value = null;
+const drop = (targetIndex: number) => {
+    if (draggedIndex.value !== null && model.value && draggedIndex.value !== targetIndex) {
+        // Switch elements
+        [model.value[draggedIndex.value], model.value[targetIndex]] = [model.value[targetIndex], model.value[draggedIndex.value]];
     }
+
+    draggedIndex.value = null;
+};
+
+const dragEnd = () => {
+    draggedIndex.value = null;
 };
 </script>
 
 <template>
-    <div class="border-secondary-200 flex items-center gap-2 rounded-lg border bg-white p-3.5 transition" @dragover.prevent @drop="drop(index)">
-        <div draggable="true" @dragstart="(e) => dragStart(index, e)" class="cursor-move">
+    <div class="border-secondary-200 gap-2 rounded-lg bg-white p-3.5 flex items-center border transition" @dragover.prevent @drop="drop(index)">
+        <div draggable="true" @dragstart="(e) => dragStart(index, e)" @dragend="dragEnd" class="cursor-move">
             <IconGrip />
         </div>
         <slot />
