@@ -24,9 +24,9 @@ class FormController extends Controller
     {
         $validated = $request->validated();
 
-        $form = Form::create($validated);
+        Form::create($validated);
 
-        return to_route('admin.form.show', $form);
+        return to_route('admin.form.index');
     }
 
     public function show(Form $form)

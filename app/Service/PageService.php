@@ -45,6 +45,7 @@ class PageService
 
         // Attach and update blocks to the page
         $this->syncBlocks($page, $validated);
+        $this->syncForms($page, $validated);
 
         return $page;
     }
@@ -66,6 +67,16 @@ class PageService
         });
 
         $page->blocks()->sync($blocks);
+    }
+
+    private function syncForms(Page $page, $validated)
+    {
+        // Update forms
+        $forms = collect($validated['forms'])->mapWithKeys(function ($form) {
+            return [$form['id'] => []];
+        });
+
+        $page->forms()->sync($forms);
     }
 
     private function extractPageData($validated)

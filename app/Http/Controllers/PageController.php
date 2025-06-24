@@ -7,6 +7,7 @@ use App\Http\Requests\StorePageRequest;
 use App\Http\Requests\UpdatePageRequest;
 use App\Models\Block;
 use App\Models\BlockType;
+use App\Models\Form;
 use App\Models\Page;
 use App\Service\PageService;
 use Illuminate\Http\Request;
@@ -56,11 +57,12 @@ class PageController extends Controller
      */
     public function show(Page $page)
     {
-        $page->load('blocks');
+        $page->load(['blocks', 'forms']);
         $blocks = Block::all();
         $blockTypes = BlockType::all();
+        $forms = Form::all();
 
-        return Inertia::render('Admin/Page/Show', compact('page', 'blocks', 'blockTypes'));
+        return Inertia::render('Admin/Page/Show', compact('page', 'blocks', 'blockTypes', 'forms'));
     }
 
     /**

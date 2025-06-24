@@ -24,7 +24,7 @@ class ViewController extends Controller
             abort(404);
         }
 
-        $page->load(['blocks']);
+        $page->load(['blocks', 'forms']);
 
         $this->hydratePage($page);
 
@@ -45,7 +45,7 @@ class ViewController extends Controller
             abort(404);
         }
 
-        $page->load(['blocks']);
+        $page->load(['blocks', 'forms']);
 
         if ($page->is_archive) {
             $page->load('collections');

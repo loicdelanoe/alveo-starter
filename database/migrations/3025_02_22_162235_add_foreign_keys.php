@@ -41,6 +41,15 @@ return new class extends Migration
         Schema::table('pages', function (Blueprint $table) {
             $table->foreign('collection_type_id')->references('id')->on('collection_types')->onDelete('set null');
         });
+
+        Schema::table('form_submissions', function (Blueprint $table) {
+            $table->foreign('form_id')->references('id')->on('forms')->onDelete('cascade');
+        });
+
+        Schema::table('formables', function (Blueprint $table) {
+            $table->foreign('form_id')->references('id')->on('forms')->onDelete('cascade');
+            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
+        });
     }
 
     /**

@@ -7,6 +7,7 @@ import { getIconCpt } from '@/utils/mapping';
 const props = defineProps<{
     label: string;
     title: string;
+    subtitle?: string;
     variant: 'primary' | 'secondary' | 'outline';
     size: 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
     position: 'left' | 'center';
@@ -66,7 +67,10 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape));
                         :class="[modalClass, modalPosition]"
                     >
                         <div class="flex w-full items-center justify-between">
-                            <h2 class="text-2xl font-medium">{{ title }}</h2>
+                            <div class="flex flex-col">
+                                <h2 class="text-2xl font-medium">{{ title }}</h2>
+                                <p v-if="subtitle" class="italic opacity-50">{{ subtitle }}</p>
+                            </div>
                             <div class="gap-4 flex">
                                 <slot name="action" />
                                 <Action tag="button" class="" variant="icon" @click="close">

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\FormSubmissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('admin/forms')->group(function () {
@@ -12,4 +13,10 @@ Route::middleware('auth')->prefix('admin/forms')->group(function () {
     Route::post('/', [FormController::class, 'store'])->name('admin.form.store');
 
     Route::delete('/{form:slug}', [FormController::class, 'destroy'])->name('admin.form.destroy');
+
+    Route::get('/{form:slug}/submissions', [FormSubmissionController::class, 'index'])->name('admin.form.submissions.index');
+    Route::get('/{form:slug}/submissions/{formSubmissions}', [FormSubmissionController::class, 'show'])->name('admin.form.submissions.show');
 });
+
+Route::post('/forms/{form:slug}/submit', [FormSubmissionController::class, 'store'])
+    ->name('form.submit');

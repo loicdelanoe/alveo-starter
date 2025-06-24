@@ -4,6 +4,7 @@ namespace App\Concerns;
 
 use App\Models\BlockType;
 use App\Models\CollectionType;
+use App\Models\Form;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -43,6 +44,35 @@ trait hasDynamicValidation
         }
 
         return $validator->validated();
+    }
+
+    public function validateForm(array $data, Form $form): array
+    {
+        [$rules, $attributes] = $this->generateFormRules($form);
+
+        return Validator::make($data, $rules, [], $attributes)->validateWithBag('clientForm');
+    }
+
+    public function generateFormRules(Form $form): array
+    {
+        $rules = [];
+        $attributes = [];
+
+        foreach ($form['fields'] as $field) {
+            $fieldName = $field['name'];
+
+            $fieldRules = $field['validation'] ?? [];
+
+            $fieldRules = implode('|', $fieldRules);
+
+            // Rename fields.fieldName to fieldName
+            $attributes[$fieldName] = $field['name'];
+
+            // Push the rules to the rules array
+            $rules[$fieldName] = $fieldRules;
+        }
+
+        return [$rules, $attributes];
     }
 
     public function generateRules(BlockType|CollectionType $type): array

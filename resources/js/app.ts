@@ -8,7 +8,6 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import Action from './components/admin/Action.vue';
 import Can from './components/admin/Permission/Can.vue';
-import { initializeTheme } from './composables/useAppearance';
 import AdminLayout from './layouts/AdminLayout.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

@@ -38,6 +38,11 @@ class Page extends Model implements Sitemapable
         return $this->hasMany(Collection::class, 'collection_type_id', 'collection_type_id');
     }
 
+    public function forms(): BelongsToMany
+    {
+        return $this->belongsToMany(Form::class, Formable::class);
+    }
+
     protected function createdAt(): Attribute
     {
         return Attribute::make(

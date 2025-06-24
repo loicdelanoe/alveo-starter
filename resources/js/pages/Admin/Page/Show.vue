@@ -2,7 +2,6 @@
 import { useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-import { ExtendedPageProps } from '@/components/admin/Form/AsideField.vue';
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
 import Block from '@/components/admin/Form/Page/Block.vue';
 import MultiBlockAdd from '@/components/admin/Form/Page/MultiBlockAdd.vue';
@@ -22,16 +21,20 @@ import PanelLayout from '@/Layouts/PanelLayout.vue';
 import { Page } from '@/types/models/page';
 import { deleteItem } from '@/utils/utils';
 
+import CheckboxInput from '@/components/admin/Form/CheckboxInput.vue';
+import IconClose from '@/components/admin/Icon/IconClose.vue';
 import type { BlockType } from '@/Pages/Admin/Block/Create.vue';
 import type { Block as TBlock } from '@/types/models/block';
+import type { Form } from '@/types/models/form';
 
-const { page, blocks } = defineProps<{
+const { page } = defineProps<{
     page: Page;
     blocks: TBlock[];
     blockTypes: BlockType[];
+    forms: Form[];
 }>();
 
-const pageProps = usePage<ExtendedPageProps>().props;
+const pageProps = usePage().props;
 
 export type PageForm = {
     status: string;
@@ -55,6 +58,7 @@ const form = useForm<PageForm>({
     blocks: page.blocks as TBlock[],
     is_archive: page.is_archive,
     collection_type_id: page.collection_type_id || '',
+    forms: page.forms as Form[],
 });
 
 const status = ['draft', 'published'];
@@ -70,6 +74,7 @@ const isHome = page.is_home;
 
 const createBlockModal = ref(false);
 const existingBlockModal = ref(false);
+const formsModal = ref(false);
 
 const tab = ref(0);
 const tabs = [
@@ -93,6 +98,10 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
     label: key,
     value: pageProps.collectionTypes[key],
 }));
+
+const removeForm = (index: number) => {
+    form.forms.splice(index, 1);
+};
 </script>
 
 <template>
@@ -196,6 +205,8 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                 <!-- Settings -->
                 <section v-show="tab === 2" class="gap-4 flex flex-col">
                     <h3 class="sr-only">Settings</h3>
+
+                    <!-- Collections -->
                     <Container>
                         <ToggleInput label="Define as archive page" name="is_archive" v-model="form.is_archive" reverse />
                         <SelectInput
@@ -206,6 +217,50 @@ const collectionTypesOptions = Object.keys(pageProps.collectionTypes).map((key) 
                             :options="collectionTypesOptions"
                             class="mt-4"
                         />
+                    </Container>
+
+                    <!-- Forms -->
+                    <Container class="gap-4 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">Link Forms</span>
+                            <Modal
+                                variant="outline"
+                                size="2xl"
+                                label="Add Forms"
+                                title="Add Forms"
+                                position="left"
+                                icon="plus"
+                                subtitle="Select forms to link with this page"
+                                v-model="formsModal"
+                            >
+                                <div class="gap-4 flex flex-col">
+                                    <ul class="gap-2 flex flex-col">
+                                        <li v-for="formItem in forms" :key="formItem.id" class="gap-2 flex items-center">
+                                            <CheckboxInput
+                                                :label="formItem.name"
+                                                :name="`formItem-${formItem.id}`"
+                                                :value="formItem"
+                                                v-model="form.forms"
+                                                transparent
+                                            />
+                                        </li>
+                                    </ul>
+
+                                    <Action tag="button" variant="primary" @click="formsModal = false">Add Form(s)</Action>
+                                </div>
+                            </Modal>
+                        </div>
+
+                        <ul v-if="form.forms.length" class="gap-2 flex flex-col">
+                            <Container v-for="(formItem, index) in form.forms" :key="formItem.id" class="flex items-center justify-between">
+                                {{ formItem.name }}
+
+                                <Action tag="button" variant="icon" @click="removeForm(index)">
+                                    <span class="sr-only">Remove Form</span>
+                                    <IconClose />
+                                </Action>
+                            </Container>
+                        </ul>
                     </Container>
                 </section>
             </div>

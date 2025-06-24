@@ -22,6 +22,7 @@ defineProps<{
                 :is="defineAsyncComponent(() => getBlockCpt(block.block_type.type) as Promise<Component>)"
                 :content="block.content"
                 :collections="page.collections"
+                :forms="page.forms"
             />
         </Suspense>
     </ClientLayout>

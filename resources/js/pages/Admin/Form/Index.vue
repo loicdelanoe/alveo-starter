@@ -25,7 +25,7 @@ defineProps<{
             :collection="forms"
             :columns="['Name', 'Slug', 'Created at', 'Updated at']"
             column-link="slug"
-            route-name="admin.form.show"
+            route-name="admin.form.submissions.index"
             hasSearch
         />
     </PanelLayout>

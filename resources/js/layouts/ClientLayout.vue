@@ -26,7 +26,7 @@ const title = computed(() => `${props.page.title} - ${pageProps.settings.site_na
 
     <h1 class="sr-only">{{ title }}</h1>
 
-    <main class="flex flex-col">
+    <main>
         <slot />
     </main>
 </template>
