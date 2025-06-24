@@ -2,17 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFormRequest;
+use App\Models\Form;
 use Inertia\Inertia;
 
 class FormController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Form/Index');
+        $forms = Form::paginate(8);
+
+        return Inertia::render('Admin/Form/Index', compact('forms'));
     }
 
     public function create()
     {
         return Inertia::render('Admin/Form/Create');
+    }
+
+    public function store(StoreFormRequest $request)
+    {
+        $validated = $request->validated();
+
+        $form = Form::create($validated);
+
+        return to_route('admin.form.show', $form);
+    }
+
+    public function show(Form $form)
+    {
+        dd($form);
+        // return Inertia::render('Admin/Form/Show', compact('form'));
+    }
+
+    public function destroy(Form $form)
+    {
+        $form->delete();
+
+        return to_route('admin.form.index')->with('success', 'Form deleted successfully.');
     }
 }
