@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
-    collection: any;
-}>();
+    collection: any
+}>()
 </script>
 
 <template>
