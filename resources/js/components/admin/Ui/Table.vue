@@ -77,13 +77,16 @@ const getColumn = (item: any, column: string) => {
 
 console.log(props.collectionName);
 
-
 const bulkDelete = () => {
     if (bulkActionsForm.selected.length === 0) {
         return;
     }
 
     bulkActionsForm.selected.forEach((item) => {
+        if (Array.isArray(props.columnLink)) {
+            item = [props.columnLink[0], item];
+        }
+
         bulkActionsForm.delete(route(`admin.${props.collectionName}.destroy`, item));
     });
 
@@ -93,7 +96,7 @@ const bulkDelete = () => {
 
 watch(isAllSelected, () => {
     if (isAllSelected.value) {
-        bulkActionsForm.selected = props.collection.data.map((item) => item[props.columnLink]);
+        bulkActionsForm.selected = props.collection.data.map((item) => item[props.columnLink[1]] ?? item[props.columnLink]);
     } else {
         bulkActionsForm.selected = [];
     }
@@ -101,15 +104,15 @@ watch(isAllSelected, () => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-3">
+    <div class="gap-3 flex flex-col">
         <!-- Search bar -->
-        <div class="flex flex-col items-start gap-4 md:flex-row md:items-end">
-            <div v-if="hasSearch" class="flex w-full md:w-80">
+        <div class="gap-4 md:flex-row md:items-end flex flex-col items-start">
+            <div v-if="hasSearch" class="md:w-80 flex w-full">
                 <InputLabel label="Search" name="search" type="search" placeholder="Home…" v-model="search" @keyup="onSearch" />
             </div>
             <Dropdown class="md:ml-auto">
                 <button
-                    class="hover:bg-secondary-100 flex cursor-pointer items-center gap-2 rounded-md px-3.5 py-2 text-red-700 transition"
+                    class="hover:bg-secondary-100 gap-2 rounded-md px-3.5 py-2 text-red-700 flex cursor-pointer items-center transition"
                     @click="bulkDelete"
                 >
                     <IconTrash />
@@ -119,16 +122,16 @@ watch(isAllSelected, () => {
         </div>
 
         <!-- Table -->
-        <div class="border-secondary-200 relative overflow-auto rounded-xl border bg-white p-1.5 py-2">
-            <table class="bg-secondary-950 w-full rounded-lg text-left">
+        <div class="border-secondary-200 rounded-xl bg-white p-1.5 py-2 relative overflow-auto border">
+            <table class="bg-secondary-950 rounded-lg w-full text-left">
                 <!-- Thead -->
                 <thead class="text-white">
                     <tr>
-                        <th class="relative z-1 p-3">
+                        <th class="p-3 relative z-1">
                             <CheckboxInput label="all" name="all" id="all" hidden-label v-model="isAllSelected" />
                         </th>
                         <th v-for="column in formatedColumns" :key="column" scope="col" class="p-3">
-                            <span class="flex gap-2 font-medium">
+                            <span class="gap-2 font-medium flex">
                                 {{ column }}
                             </span>
                         </th>
@@ -140,22 +143,22 @@ watch(isAllSelected, () => {
                     <tr
                         v-for="(item, index) in collection.data"
                         :key="item.id"
-                        class="hover:bg-secondary-50 not-last:border-secondary-100 relative cursor-pointer bg-white transition not-last:border-b"
+                        class="hover:bg-secondary-50 not-last:border-secondary-100 bg-white relative cursor-pointer transition not-last:border-b"
                     >
                         <td class="p-3">
                             <CheckboxInput
                                 :label="`item-${index}`"
                                 :name="`item-${index}`"
                                 :id="`item-${index}`"
-                                :value="item[columnLink]"
+                                :value="item[columnLink[1]] ?? item[columnLink]"
                                 hidden-label
                                 v-model="bulkActionsForm.selected"
                             />
-                            <Link class="absolute inset-0" :href="getRoute(item, columnLink)">
+                            <Link class="inset-0 absolute" :href="getRoute(item, columnLink)">
                                 <span class="sr-only">link</span>
                             </Link>
                         </td>
-                        <td v-for="column in columnIdentifier" :key="column" class="max-w-52 truncate p-3 text-ellipsis">
+                        <td v-for="column in columnIdentifier" :key="column" class="max-w-52 p-3 truncate text-ellipsis">
                             <template v-if="columnCpt[column]">
                                 <component v-if="columnCpt[column]" :is="columnCpt[column]" :content="getColumn(item, column)" />
                             </template>

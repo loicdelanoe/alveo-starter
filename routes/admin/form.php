@@ -15,7 +15,10 @@ Route::middleware('auth')->prefix('admin/forms')->group(function () {
     Route::delete('/{form:slug}', [FormController::class, 'destroy'])->name('admin.form.destroy');
 
     Route::get('/{form:slug}/submissions', [FormSubmissionController::class, 'index'])->name('admin.form.submissions.index');
-    Route::get('/{form:slug}/submissions/{formSubmissions}', [FormSubmissionController::class, 'show'])->name('admin.form.submissions.show');
+    Route::get('/{form:slug}/submissions/{formSubmission}', [FormSubmissionController::class, 'show'])->name('admin.form.submissions.show');
+
+    Route::delete('/{form:slug}/submissions/{formSubmission}', [FormSubmissionController::class, 'destroy'])
+        ->name('admin.form.submissions.destroy');
 });
 
 Route::post('/forms/{form:slug}/submit', [FormSubmissionController::class, 'store'])
