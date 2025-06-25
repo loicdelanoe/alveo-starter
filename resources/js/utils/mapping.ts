@@ -45,9 +45,3 @@ export const getIconCpt = (icon: string) => {
 
     return cptMap[icon] || IconPlus;
 };
-
-export const getCollectionPage = (type: string) => {
-    const cptMap: { [key: string]: Component } = {};
-
-    return cptMap[type];
-};

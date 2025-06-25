@@ -7,7 +7,6 @@ import type { Component } from 'vue';
 import { defineAsyncComponent } from 'vue';
 
 defineProps<{
-    // TODO: Type this
     collectionPage: any;
     menus: Menu[];
 }>();
