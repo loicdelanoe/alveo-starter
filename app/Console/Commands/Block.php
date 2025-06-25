@@ -12,7 +12,7 @@ class Block extends Command
      *
      * @var string
      */
-    protected $signature = 'alveo:block {name}';
+    protected $signature = 'alveo:block {name} {--archive}';
 
     /**
      * The console command description.
@@ -28,19 +28,37 @@ class Block extends Command
     {
         $path = resource_path("js/components/blocks/{$this->argument('name')}.vue");
 
-        $fileContent = <<<'EOT'
+        if ($this->option('archive')) {
+            $fileContent = <<<'EOT'
         <script setup lang="ts">
         defineProps<{
             content: any
+            collections: any
         }>()
         </script>
 
         <template>
             <pre>{{ content }}</pre>
+            <pre>{{ collections }}</pre>
         </template>
 
         <style scoped></style>
         EOT;
+        } else {
+            $fileContent = <<<'EOT'
+            <script setup lang="ts">
+            defineProps<{
+                content: any
+            }>()
+            </script>
+
+            <template>
+                <pre>{{ content }}</pre>
+            </template>
+
+            <style scoped></style>
+            EOT;
+        }
 
         if (! File::exists(dirname($path))) {
             File::makeDirectory(dirname($path), 0755, true);
