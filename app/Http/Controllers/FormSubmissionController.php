@@ -21,11 +21,15 @@ class FormSubmissionController extends Controller
         return Inertia::render('Admin/FormSubmission/Index', compact('form', 'submissions'));
     }
 
-    public function show(Form $form, FormSubmission $submission)
+    public function show(Form $form, int $submissionId)
     {
-        dd($submission);
+        $submission = FormSubmission::where('form_id', $form->id)
+            ->where('id', $submissionId)
+            ->firstOrFail();
 
-        // return Inertia::render('Admin/FormSubmission/Show', compact('form', 'submission'));
+        // dd($submission->data);
+
+        return Inertia::render('Admin/FormSubmission/Show', compact('form', 'submission'));
     }
 
     public function store(Request $request, Form $form)
@@ -37,5 +41,17 @@ class FormSubmissionController extends Controller
             'data' => $validated,
             'submitted_at' => now(),
         ]);
+    }
+
+    public function destroy(Form $form, int $submissionId)
+    {
+        $submission = FormSubmission::where('form_id', $form->id)
+            ->where('id', $submissionId)
+            ->firstOrFail();
+
+        $submission->delete();
+
+        return redirect()->route('admin.form.submissions.index', $form->slug)
+            ->with('success', 'Submission deleted successfully.');
     }
 }

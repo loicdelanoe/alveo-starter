@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { Form } from '@/types/models/form';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import CheckboxInput from '../Form/CheckboxInput.vue';
+import IconClose from '../Icon/IconClose.vue';
 import Modal from '../Modal/Modal.vue';
 import Container from '../Ui/Container.vue';
 
-defineProps<{
+const props = defineProps<{
     forms: Form[];
     form: any;
 }>();
 
 const formsModal = ref(false);
+
+// Exclude form that are already linked to the page
+const availableForms = computed(() => {
+    return props.forms.filter((form: Form) => !props.form.forms.some((f: Form) => f.id === form.id));
+});
 
 const formsToAdd = ref<Form[]>([]);
 
@@ -49,14 +55,8 @@ const addForms = () => {
             >
                 <div class="gap-4 flex flex-col">
                     <ul class="gap-2 flex flex-col">
-                        <li v-for="formItem in forms" :key="formItem.id" class="gap-2 flex items-center">
-                            <CheckboxInput
-                                :label="formItem.name"
-                                :name="`formItem-${formItem.id}`"
-                                :value="formItem"
-                                v-model="formsToAdd"
-                                transparent
-                            />
+                        <li v-for="formItem in availableForms" :key="formItem.id" class="gap-2 flex items-center">
+                            <CheckboxInput :label="formItem.name" :name="formItem.slug" :value="formItem" v-model="formsToAdd" transparent />
                         </li>
                     </ul>
 
