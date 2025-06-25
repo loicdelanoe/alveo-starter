@@ -6,7 +6,14 @@ export async function resolveBlockComponent<T>(blockType: string, blocks: Record
     const normalized = blockType.toLowerCase();
 
     for (const path in blocks) {
-        const fileName = path.split('/').pop()?.replace('Block.vue', '').toLowerCase();
+        const fileName = path
+            .split('/')
+            .pop()
+            ?.replace('Block.vue', '')
+            .replace(/([a-z])([A-Z])/g, '$1-$2')
+            .toLowerCase();
+
+        console.log(fileName);
 
         if (!fileName) continue;
 
