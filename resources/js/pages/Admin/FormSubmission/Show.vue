@@ -51,9 +51,9 @@ const links = [
             <h3 class="mb-2 text-2xl font-medium">Content</h3>
             <Container>
                 <dl class="gap-4 flex flex-col">
-                    <div class="gap-4 flex" v-for="(value, key) in submission.data" :key="JSON.stringify(value)">
-                        <dt class="font-medium">{{ capitalize(key) }}</dt>
-                        <dd>{{ value }}</dd>
+                    <div class="gap-1 md:gap-4 md:flex-row flex flex-col" v-for="(value, key) in submission.data" :key="JSON.stringify(value)">
+                        <dt class="font-medium min-w-0 w-1/8">{{ capitalize(key) }}:</dt>
+                        <dd class="md:ml-4 flex-1">{{ value }}</dd>
                     </div>
                 </dl>
             </Container>
