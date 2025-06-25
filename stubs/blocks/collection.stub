@@ -1,0 +1,13 @@
+<script setup lang="ts">
+defineProps<{
+    content: any;
+    collections: any;
+}>();
+</script>
+
+<template>
+    <pre>{{ content }}</pre>
+    <pre>{{ collections }}</pre>
+</template>
+
+<style scoped></style>

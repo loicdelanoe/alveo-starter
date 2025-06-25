@@ -1,0 +1,11 @@
+<script setup lang="ts">
+defineProps<{
+    content: any;
+}>();
+</script>
+
+<template>
+    <pre>{{ content }}</pre>
+</template>
+
+<style scoped></style>

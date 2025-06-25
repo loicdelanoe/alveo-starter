@@ -27,93 +27,17 @@ class Block extends Command
     public function handle()
     {
         $path = resource_path("js/components/blocks/{$this->argument('name')}.vue");
+        $stubPath = base_path('stubs/blocks');
 
         switch ($this->option('type')) {
-            case 'collection':
-                $fileContent = <<<'EOT'
-        <script setup lang="ts">
-        defineProps<{
-            content: any
-            collections: any
-        }>()
-        </script>
-
-        <template>
-            <pre>{{ content }}</pre>
-            <pre>{{ collections }}</pre>
-        </template>
-
-        <style scoped></style>
-        EOT;
+            case 'archive':
+                $fileContent = File::get("{$stubPath}/collection.stub");
                 break;
             case 'form':
-                $fileContent = <<<'EOT'
-        <script setup lang="ts">
-        import { useDynamicForm } from '@/composables/useDynamicForm';
-        import { Form } from '@/types/models/form';
-
-        const props = defineProps<{
-            content: any
-            forms: Form[]
-        }>()
-
-        /*
-        |--------------------------------------------------------------------------
-        | Form Selection
-        |--------------------------------------------------------------------------
-        |
-        | We attempt to locate a form by its unique slug. You should replace
-        | `'my-form'` with the appropriate slug based on your use case.
-        | An error is thrown if the form is not found.
-        |
-        */
-        const myForm = props.forms.find((form) => form.slug === 'my-form');
-
-        if (!myForm) {
-            throw new Error('Form not found');
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Dynamic Form Initialization
-        |--------------------------------------------------------------------------
-        |
-        | The `useDynamicForm` composable provides:
-        |
-        | - `form`        : Reactive form data.
-        | - `onSubmit`    : Submission handler.
-        | - `errors`      : Validation error state.
-        | - `showMessage` : Success message state (e.g. after submission).
-        |
-        | This allows rendering and managing a fully dynamic form based
-        | on the selected configuration.
-        |
-        */
-        const { form, onSubmit, errors, showMessage } = useDynamicForm(myForm);
-        </script>
-
-        <template>
-            <pre>{{ content }}</pre>
-            <pre>{{ form }}</pre>
-        </template>
-
-        <style scoped></style>
-        EOT;
+                $fileContent = File::get("{$stubPath}/form.stub");
                 break;
             default:
-                $fileContent = <<<'EOT'
-        <script setup lang="ts">
-        defineProps<{
-            content: any
-        }>()
-        </script>
-
-        <template>
-            <pre>{{ content }}</pre>
-        </template>
-
-        <style scoped></style>
-        EOT;
+                $fileContent = File::get("{$stubPath}/default.stub");
                 break;
         }
 
