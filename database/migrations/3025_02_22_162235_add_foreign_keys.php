@@ -31,7 +31,7 @@ return new class extends Migration
 
         Schema::table('navigations', function (Blueprint $table) {
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
-            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('navigations')->onDelete('cascade');
         });
 
         Schema::table('actions', function (Blueprint $table) {

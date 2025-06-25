@@ -18,6 +18,7 @@ require __DIR__.'/admin/user.php';
 require __DIR__.'/admin/media.php';
 require __DIR__.'/admin/action.php';
 require __DIR__.'/admin/form.php';
+require __DIR__.'/admin/link.php';
 
 Route::get('/', [ViewController::class, 'index'])->name('page.index');
 Route::get('/{slug}', [ViewController::class, 'page'])->name('page.show');

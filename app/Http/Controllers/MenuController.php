@@ -20,7 +20,7 @@ class MenuController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         })->orderBy('created_at', 'desc')->paginate(8);
 
-        $menus->load('pages');
+        // $menus->load('pages');
 
         return Inertia::render('Admin/Menu/Index', compact('menus'));
     }
@@ -30,10 +30,15 @@ class MenuController extends Controller
      */
     public function create()
     {
-        $pages = Page::where('status', 'published')
+        $pages = Page::where('status', 'published')->select(['id', 'title', 'slug'])
             ->get();
 
-        return Inertia::render('Admin/Menu/Create', compact('pages'));
+        $navigableTypes = [
+            'page' => 'page',
+            'link' => 'link',
+        ];
+
+        return Inertia::render('Admin/Menu/Create', compact('pages', 'navigableTypes'));
     }
 
     /**
@@ -49,8 +54,6 @@ class MenuController extends Controller
             'active' => $validated['active'],
         ]);
 
-        $menu->pages()->attach($validated['pages']);
-
         return to_route('admin.menu.show', $menu)->with('success', 'Menu created successfully.');
     }
 
@@ -59,7 +62,7 @@ class MenuController extends Controller
      */
     public function show(Menu $menu)
     {
-        $menu->load(['pages', 'actions']);
+        $menu->load(['navigations.navigable']);
 
         $pages = Page::where('status', 'published')
             ->get();
@@ -88,12 +91,18 @@ class MenuController extends Controller
             'active' => $validated['active'],
         ]);
 
-        // Sync with page
-        $navigations = collect($validated['pages'])->mapWithKeys(function (int $page, int $key) {
-            return [$page => ['order' => $key]];
-        });
+        // Replace existing navigations
+        $menu->navigations()->delete(); // or ->forceDelete() if soft deleted
 
-        $menu->pages()->sync($navigations);
+        foreach ($validated['navigations'] as $index => $navigation) {
+            $menu->navigations()->create([
+                'parent_id' => $navigation['parent_id'] ?? null,
+                'navigable_type' => $navigation['navigable_type'],
+                'navigable_id' => $navigation['navigable_id'],
+                'target' => $navigation['target'] ?? null,
+                'order' => $index,
+            ]);
+        }
 
         return to_route('admin.menu.show', $menu)->with('success', 'Menu updated successfully.');
     }

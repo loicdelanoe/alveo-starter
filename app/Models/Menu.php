@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -24,9 +23,9 @@ class Menu extends Model
         'active' => 'boolean',
     ];
 
-    public function pages(): BelongsToMany
+    public function navigations()
     {
-        return $this->belongsToMany(Page::class, Navigation::class)->withPivot('order')->orderBy('order');
+        return $this->hasMany(Navigation::class)->whereNull('parent_id')->orderBy('order');
     }
 
     public function actions(): HasMany

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
@@ -41,6 +42,11 @@ class Page extends Model implements Sitemapable
     public function forms(): BelongsToMany
     {
         return $this->belongsToMany(Form::class, Formable::class);
+    }
+
+    public function navigation(): MorphOne
+    {
+        return $this->morphOne(Navigation::class, 'navigable');
     }
 
     protected function createdAt(): Attribute

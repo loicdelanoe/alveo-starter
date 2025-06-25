@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// import MainNavigation from '@/components/partials/MainNavigation.vue';
+import MainNavigation from '@/components/partials/MainNavigation.vue';
+import { getMenu } from '@/lib/utils';
 import { Menu } from '@/types/models/menu';
 import { Page } from '@/types/models/page';
 import { Head, usePage } from '@inertiajs/vue3';
@@ -14,7 +15,7 @@ const pageProps = usePage().props;
 
 const title = computed(() => `${props.page.title} - ${pageProps.settings.site_name}`);
 
-// const mainNavigation = getMenu('main-navigation');
+const mainNavigation = getMenu('test');
 </script>
 
 <template>
@@ -29,7 +30,7 @@ const title = computed(() => `${props.page.title} - ${pageProps.settings.site_na
 
     <h1 class="sr-only">{{ title }}</h1>
 
-    <!-- <MainNavigation v-if="mainNavigation" :menu="mainNavigation" /> -->
+    <MainNavigation v-if="mainNavigation" :menu="mainNavigation" />
 
     <main>
         <slot />

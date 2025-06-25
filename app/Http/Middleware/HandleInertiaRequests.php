@@ -51,7 +51,7 @@ class HandleInertiaRequests extends Middleware
                 'blockTypes' => BlockType::all()->map(fn ($blockType) => ['name' => $blockType->name, 'type' => $blockType->type]),
                 'collectionTypes' => CollectionType::all()->map(fn ($collectionType) => ['name' => $collectionType->name, 'type' => $collectionType->type]),
             ],
-            'menus' => fn () => \App\Models\Menu::where('active', true)->get()->load(['pages', 'actions']),
+            'menus' => fn () => \App\Models\Menu::where('active', true)->get()->load('navigations.navigable'),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

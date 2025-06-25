@@ -1,70 +1,95 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { computed } from '@vue/reactivity';
-import { ref } from 'vue';
 
-import CheckboxInput from '@/components/admin/Form/CheckboxInput.vue';
+import AsidePage from '@/components/admin/Form/AsidePage.vue';
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
-import MenuAction from '@/components/admin/Form/MenuAction.vue';
 import ToggleInput from '@/components/admin/Form/ToggleInput.vue';
-import IconClose from '@/components/admin/Icon/IconClose.vue';
-import IconPlus from '@/components/admin/Icon/IconPlus.vue';
 import IconTrash from '@/components/admin/Icon/IconTrash.vue';
 import Modal from '@/components/admin/Modal/Modal.vue';
 import Breadcrumbs from '@/components/admin/Ui/Breadcrumbs.vue';
 import Container from '@/components/admin/Ui/Container.vue';
-import Draggable from '@/components/admin/Ui/Draggable.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
-import ActionCreate from '@/pages/Admin/Action/Create.vue';
 import { deleteItem } from '@/utils/utils';
 
+import AsideLinks from '@/components/admin/Form/AsideLinks.vue';
+import IconClose from '@/components/admin/Icon/IconClose.vue';
+import IconGrip from '@/components/admin/Icon/IconGrip.vue';
+import SlugCell from '@/components/admin/Ui/Table/SlugCell.vue';
 import type { Menu } from '@/types/models/menu';
 import type { Page } from '@/types/models/page';
+import { ref } from 'vue';
+import { VueDraggable } from 'vue-draggable-plus';
 
 const props = defineProps<{
     menu: Menu;
     pages: Page[];
 }>();
 
-const selectedPages = ref<number[]>([]);
-const isOpen = ref(false);
-const actionModal = ref(false);
-const draggedIndex = ref<number | null>(null);
-
-const filteredPages = computed(() => {
-    return props.pages.filter((page) => {
-        return !props.menu.pages.some((menuPage) => page.id === menuPage.id);
-    });
-});
-
-const formattedFormPages = computed(() => {
-    return form.pages.map((id) => props.pages.find((p) => p.id === id)).filter((p): p is Page => !!p); // Remove undefined (in case of mismatch)
-});
+const linksModal = ref(false);
+const pagesModal = ref(false);
 
 const form = useForm({
     name: props.menu.name,
     slug: props.menu.slug,
     active: props.menu.active,
-    pages: props.menu.pages.map((page) => page.id),
+    navigations: props.menu.navigations || [],
 });
-
-const removeFromMenu = (index: number) => {
-    form.pages.splice(index, 1);
-};
 
 const onSubmit = () => {
     form.patch(route('admin.menu.update', props.menu.slug), {
         preserveScroll: true,
-        // preserveState: false,
     });
 };
 
-const addPages = () => {
-    form.pages.push(...selectedPages.value);
+const handleAddLink = (link: any) => {
+    console.log('Adding link:', link);
+    form.navigations.push({
+        menu_id: props.menu.id,
+        parent_id: null,
+        navigable_id: link.id,
+        navigable_type: 'link',
+        order: form.navigations.length,
+        navigable: {
+            id: link.id,
+            title: link.title,
+            url: link.url,
+            blank: link.blank,
+        },
+    });
 
-    selectedPages.value = [];
-    isOpen.value = false;
+    linksModal.value = false;
 };
+
+const handleAddPages = (pages: Page[]) => {
+    pages.forEach((page) => {
+        form.navigations.push({
+            menu_id: props.menu.id,
+            parent_id: null,
+            navigable_id: page.id,
+            navigable_type: 'page',
+            order: form.navigations.length,
+            navigable: {
+                id: page.id,
+                title: page.title,
+                slug: page.slug,
+            },
+        });
+    });
+
+    pagesModal.value = false;
+};
+
+const removeNavigation = (index: number) => {
+    if (form.navigations[index].navigable_type === 'link') {
+        // delete in db the link
+        deleteItem(route('admin.link.destroy', form.navigations[index].navigable.id), 'Are you sure you want to delete this link?');
+    }
+    form.navigations.splice(index, 1);
+};
+
+const pagesNotInMenu = ref(
+    props.pages.filter((page) => !form.navigations.some((nav) => nav.navigable_id === page.id && nav.navigable_type === 'page')),
+);
 </script>
 
 <template>
@@ -101,77 +126,42 @@ const addPages = () => {
                 <InputLabel label="Slug" name="slug" type="text" v-model="form.slug" :error="form.errors.slug" hint="A unique identifier" />
             </Container>
 
-            <!-- Pages -->
-            <div class="gap-4 md:grid-cols-2 grid grid-cols-1">
-                <section class="gap-4 flex flex-col">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-medium">Pages</h2>
-                        <Can permission="edit menus">
-                            <Modal
-                                label="Add Pages"
-                                title="Choose pages"
-                                variant="outline"
-                                size="lg"
-                                position="left"
-                                v-model="isOpen"
-                                icon="plus"
-                                button-size="small"
-                            >
-                                <ul v-if="pages">
-                                    <li v-for="page in filteredPages" :key="`page-${page.id}`">
-                                        <CheckboxInput
-                                            :label="page.title"
-                                            :name="`page-${page.id}`"
-                                            :value="page.id"
-                                            v-model="selectedPages"
-                                            class="page-checkbox pl-3 w-full cursor-pointer"
-                                        />
-                                    </li>
-                                </ul>
+            <!-- Entries -->
+            <section>
+                <div class="mb-4 flex items-center">
+                    <h3 class="text-2xl font-medium">Entries</h3>
 
-                                <template #footer>
-                                    <Action tag="button" variant="primary" @click="addPages">
-                                        <IconPlus />
-                                        Add {{ selectedPages.length }} page(s)
-                                    </Action>
-                                </template>
-                            </Modal>
-                        </Can>
-                    </div>
-
-                    <!-- Drag n Drop -->
-                    <ul class="gap-2 flex flex-col">
-                        <li v-for="(page, index) in formattedFormPages" :key="page.id">
-                            <Draggable
-                                :class="{ 'opacity-0': draggedIndex === index }"
-                                :index="index"
-                                :pos-x="20"
-                                :pos-y="25"
-                                v-model="form.pages"
-                                v-model:dragged="draggedIndex"
-                            >
-                                {{ page.title }}
-                                <Action tag="button" variant="icon" class="ml-auto" @click="removeFromMenu(index)">
-                                    <IconClose />
-                                </Action>
-                            </Draggable>
-                        </li>
-                    </ul>
-                </section>
-                <section class="gap-4 flex flex-col">
-                    <div class="gap-2 flex items-center justify-between">
-                        <h3 class="text-xl font-medium">Actions</h3>
-                        <Modal label="Add Action" title="Add Action" variant="primary" size="xl" position="left" icon="plus" v-model="actionModal">
-                            <ActionCreate :menu-form="form" :menu-id="menu.id" @close-modal="actionModal = false" />
+                    <div class="gap-2 ml-auto flex items-center">
+                        <Modal variant="primary" size="2xl" label="Add Pages" title="Add Pages" position="left" v-model="pagesModal">
+                            <AsidePage @add-pages="handleAddPages" :pages="pagesNotInMenu" />
+                        </Modal>
+                        <Modal variant="outline" size="2xl" label="Add Custom Link" title="Add Custom Link" position="left" v-model="linksModal">
+                            <AsideLinks @add-link="handleAddLink" />
                         </Modal>
                     </div>
-                    <ul class="gap-2 flex flex-col">
-                        <li v-for="(action, index) in menu.actions" :key="action.id">
-                            <MenuAction :action="action" :index="index" />
-                        </li>
-                    </ul>
-                </section>
-            </div>
+                </div>
+
+                <Container>
+                    <VueDraggable tag="ul" class="gap-2 flex flex-col" ref="el" v-model="form.navigations">
+                        <Container
+                            tag="li"
+                            class="py-1 flex items-center justify-between hover:cursor-move"
+                            v-for="(navigation, index) in form.navigations"
+                            :key="JSON.stringify(navigation)"
+                        >
+                            <div class="gap-2 flex items-center">
+                                <IconGrip />
+                                <span class="font-medium">{{ navigation.navigable.title }}</span>
+                                <SlugCell :content="navigation.navigable.slug ?? navigation.navigable.url" />
+                            </div>
+
+                            <Action tag="button" variant="icon" @click="removeNavigation(index)">
+                                <IconClose />
+                            </Action>
+                        </Container>
+                    </VueDraggable>
+                </Container>
+            </section>
         </div>
     </PanelLayout>
 </template>

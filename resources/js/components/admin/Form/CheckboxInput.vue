@@ -6,7 +6,7 @@ defineProps<{
     name: string;
     error?: string;
     required?: boolean;
-    value?: string | number;
+    value?: string | number | any;
     hint?: string;
     disabled?: boolean;
     reverse?: boolean;

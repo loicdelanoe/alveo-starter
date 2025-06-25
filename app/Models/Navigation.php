@@ -3,18 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Navigation extends Model
 {
-    protected $fillabel = ['menu_id', 'page_id'];
+    protected $fillable = [
+        'menu_id',
+        'parent_id',
+        'navigable_id',
+        'navigable_type',
+        'target',
+        'order',
+    ];
 
-    public function menu()
+    public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
-    public function page()
+    public function parent(): BelongsTo
     {
-        return $this->belongsTo(Page::class);
+        return $this->belongsTo(Navigation::class, 'parent_id');
+    }
+
+    public function children(): HasMany {
+        return $this->hasMany(Navigation::class, 'parent_id')->orderBy('order');
+    }
+
+    public function navigable()
+    {
+        return $this->morphTo();
     }
 }

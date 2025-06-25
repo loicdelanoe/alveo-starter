@@ -2,6 +2,11 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { onMounted, onUnmounted, shallowRef, useTemplateRef } from 'vue';
 
+defineProps<{
+    variant?: string | string[];
+    label?: string;
+}>();
+
 const isOpen = shallowRef(false);
 const button = useTemplateRef<HTMLElement>('button');
 
@@ -24,8 +29,16 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape));
 
 <template>
     <div class="relative inline-flex">
-        <Action tag="button" size="small" variant="outline" ref="button" @click.prevent="isOpen = !isOpen" class="cursor-pointer" tabindex="1">
-            Bulk Actions
+        <Action
+            tag="button"
+            size="small"
+            :variant="variant ?? 'outline'"
+            ref="button"
+            @click.prevent="isOpen = !isOpen"
+            class="cursor-pointer"
+            tabindex="1"
+        >
+            <slot name="label"> Bulk Actions </slot>
         </Action>
 
         <Transition
@@ -39,7 +52,7 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape));
             <div
                 v-show="isOpen"
                 v-on-click-outside="onClickOutsideHandler"
-                class="max-sm:left-0 md:right-0 mt-2 p-1.5 rounded-xl bg-white shadow border-secondary-200 absolute top-full z-10 w-max border-1"
+                class="max-sm:left-0 md:right-0 mt-2 p-1.5 rounded-lg bg-white shadow border-secondary-200 absolute top-full z-10 w-max border-1"
             >
                 <slot />
             </div>

@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('navigations', function (Blueprint $table) {
+        Schema::create('links', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('menu_id');
-            $table->unsignedBigInteger('parent_id')->nullable();
-
-            $table->nullableMorphs('navigable');
-            $table->string('target')->nullable();
-
-            $table->integer('order')->default(0);
+            $table->string('title');
+            $table->string('url');
+            $table->boolean('blank')->default(false);
             $table->timestamps();
         });
     }
@@ -29,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('navigations');
+        Schema::dropIfExists('links');
     }
 };
