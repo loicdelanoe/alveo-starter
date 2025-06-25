@@ -26,3 +26,4 @@ yarn-error.log
 # Alveo
 /resources/js/components/blocks
 /resources/js/components/collections
+/resources/js/components/partials

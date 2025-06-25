@@ -1,0 +1,13 @@
+<script setup lang="ts">
+import type { Menu } from '@/types/models/menu';
+
+defineProps<{
+    menu: Menu;
+}>();
+</script>
+
+<template>
+    <pre>{{ menu }}</pre>
+</template>
+
+<style scoped></style>
