@@ -29,11 +29,6 @@ return new class extends Migration
             $table->foreign('media_id')->references('id')->on('medias')->onDelete('cascade');
         });
 
-        Schema::table('navigations', function (Blueprint $table) {
-            $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
-            $table->foreign('parent_id')->references('id')->on('navigations')->onDelete('cascade');
-        });
-
         Schema::table('actions', function (Blueprint $table) {
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
         });
@@ -49,6 +44,14 @@ return new class extends Migration
         Schema::table('formables', function (Blueprint $table) {
             $table->foreign('form_id')->references('id')->on('forms')->onDelete('cascade');
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
+        });
+
+        Schema::table('links', function (Blueprint $table) {
+            $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
+        });
+
+        Schema::table('groups', function (Blueprint $table) {
+            $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
         });
     }
 

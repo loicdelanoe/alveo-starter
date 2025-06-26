@@ -9,12 +9,13 @@ class LinkController extends Controller
 {
     public function store(Request $request)
     {
-        // dd($request->all());
-
         $validated = $request->validate([
+            'menu_id' => 'required|integer|exists:menus,id',
+            'group_id' => 'nullable|integer',
             'title' => 'required|string|max:255',
             'url' => 'required|string|max:255',
             'target' => 'nullable|boolean',
+            'order' => 'integer',
         ]);
 
         $link = \App\Models\Link::create($validated);

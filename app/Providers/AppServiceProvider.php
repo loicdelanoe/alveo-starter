@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'page' => '\App\Models\Page',
             'link' => '\App\Models\Link',
+            'group' => '\App\Models\Group',
         ]);
     }
 }

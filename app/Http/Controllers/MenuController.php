@@ -62,12 +62,14 @@ class MenuController extends Controller
      */
     public function show(Menu $menu)
     {
-        $menu->load(['navigations.navigable']);
-
         $pages = Page::where('status', 'published')
             ->get();
 
-        return Inertia::render('Admin/Menu/Show', compact('menu', 'pages'));
+        $menu->load(['links', 'groups.links']);
+
+        $menuEntries = $menu->entries;
+
+        return Inertia::render('Admin/Menu/Show', compact('menu', 'pages', 'menuEntries'));
     }
 
     /**
@@ -91,17 +93,21 @@ class MenuController extends Controller
             'active' => $validated['active'],
         ]);
 
-        // Replace existing navigations
-        $menu->navigations()->delete(); // or ->forceDelete() if soft deleted
+        foreach ($validated['entries'] as $index => $entry) {
+            // If its a link
+            if (array_key_exists('group_id', $entry)) {
+                $link = $menu->links()->find($entry['id']);
 
-        foreach ($validated['navigations'] as $index => $navigation) {
-            $menu->navigations()->create([
-                'parent_id' => $navigation['parent_id'] ?? null,
-                'navigable_type' => $navigation['navigable_type'],
-                'navigable_id' => $navigation['navigable_id'],
-                'target' => $navigation['target'] ?? null,
-                'order' => $index,
-            ]);
+                $link->update([
+                    'order' => $index,
+                ]);
+            } else {
+                $group = $menu->groups()->find($entry['id']);
+
+                $group->update([
+                    'order' => $index,
+                ]);
+            }
         }
 
         return to_route('admin.menu.show', $menu)->with('success', 'Menu updated successfully.');

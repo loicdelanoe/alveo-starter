@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('menu_id');
+            $table->unsignedBigInteger('group_id')->nullable();
             $table->string('title');
             $table->string('url');
             $table->boolean('blank')->default(false);
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

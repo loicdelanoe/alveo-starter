@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 class Menu extends Model
@@ -23,14 +22,25 @@ class Menu extends Model
         'active' => 'boolean',
     ];
 
-    public function navigations()
+    public function links()
     {
-        return $this->hasMany(Navigation::class)->whereNull('parent_id')->orderBy('order');
+        return $this->hasMany(Link::class, 'menu_id')
+            ->orderBy('order');
     }
 
-    public function actions(): HasMany
+    public function groups()
     {
-        return $this->hasMany(Action::class);
+        return $this->hasMany(Group::class, 'menu_id')
+            ->orderBy('order');
+    }
+
+    protected function entries(): Attribute
+    {
+        return Attribute::get(fn () => $this->links->merge($this->groups)
+            ->filter(fn ($entry) => empty($entry->group_id))
+            ->sortBy('order')
+            ->values()
+        );
     }
 
     protected function createdAt(): Attribute

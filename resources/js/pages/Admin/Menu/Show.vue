@@ -1,38 +1,40 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 
-import AsidePage from '@/components/admin/Form/AsidePage.vue';
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
 import ToggleInput from '@/components/admin/Form/ToggleInput.vue';
 import IconTrash from '@/components/admin/Icon/IconTrash.vue';
-import Modal from '@/components/admin/Modal/Modal.vue';
 import Breadcrumbs from '@/components/admin/Ui/Breadcrumbs.vue';
 import Container from '@/components/admin/Ui/Container.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
 import { deleteItem } from '@/utils/utils';
+import { VueDraggable } from 'vue-draggable-plus';
 
-import AsideLinks from '@/components/admin/Form/AsideLinks.vue';
-import IconClose from '@/components/admin/Icon/IconClose.vue';
+import AsideChildren from '@/components/admin/Form/Aside/AsideChildren.vue';
+import AsideGroup from '@/components/admin/Form/Aside/AsideGroup.vue';
+import AsideLink from '@/components/admin/Form/Aside/AsideLink.vue';
 import IconGrip from '@/components/admin/Icon/IconGrip.vue';
+import Modal from '@/components/admin/Modal/Modal.vue';
 import SlugCell from '@/components/admin/Ui/Table/SlugCell.vue';
 import type { Menu } from '@/types/models/menu';
 import type { Page } from '@/types/models/page';
 import { ref } from 'vue';
-import { VueDraggable } from 'vue-draggable-plus';
 
 const props = defineProps<{
     menu: Menu;
+    menuEntries: any[];
     pages: Page[];
 }>();
 
-const linksModal = ref(false);
-const pagesModal = ref(false);
+const linkModal = ref(false);
+const groupModal = ref(false);
+const childrenModal = ref(false);
 
 const form = useForm({
     name: props.menu.name,
     slug: props.menu.slug,
     active: props.menu.active,
-    navigations: props.menu.navigations || [],
+    entries: props.menuEntries ?? [],
 });
 
 const onSubmit = () => {
@@ -41,55 +43,27 @@ const onSubmit = () => {
     });
 };
 
-const handleAddLink = (link: any) => {
-    console.log('Adding link:', link);
-    form.navigations.push({
-        menu_id: props.menu.id,
-        parent_id: null,
-        navigable_id: link.id,
-        navigable_type: 'link',
-        order: form.navigations.length,
-        navigable: {
-            id: link.id,
-            title: link.title,
-            url: link.url,
-            blank: link.blank,
-        },
+const handleAddLink = (link: { title: string; url: string; blank: boolean }) => {
+    form.entries.push({ ...link });
+
+    linkModal.value = false;
+};
+
+const handleAddGroup = (group: { name: string; slug: string }) => {
+    form.entries.push({ ...group });
+
+    groupModal.value = false;
+};
+
+const handleAddChildren = (link: { title: string; url: string; blank: boolean; group_id: number }, groupId: number) => {
+    console.log('Adding children link:', link, 'to group ID:', groupId);
+
+    form.entries[form.entries.findIndex((entry) => entry.group_id === groupId)].push({
+        ...link,
     });
 
-    linksModal.value = false;
+    childrenModal.value = false;
 };
-
-const handleAddPages = (pages: Page[]) => {
-    pages.forEach((page) => {
-        form.navigations.push({
-            menu_id: props.menu.id,
-            parent_id: null,
-            navigable_id: page.id,
-            navigable_type: 'page',
-            order: form.navigations.length,
-            navigable: {
-                id: page.id,
-                title: page.title,
-                slug: page.slug,
-            },
-        });
-    });
-
-    pagesModal.value = false;
-};
-
-const removeNavigation = (index: number) => {
-    if (form.navigations[index].navigable_type === 'link') {
-        // delete in db the link
-        deleteItem(route('admin.link.destroy', form.navigations[index].navigable.id), 'Are you sure you want to delete this link?');
-    }
-    form.navigations.splice(index, 1);
-};
-
-const pagesNotInMenu = ref(
-    props.pages.filter((page) => !form.navigations.some((nav) => nav.navigable_id === page.id && nav.navigable_type === 'page')),
-);
 </script>
 
 <template>
@@ -120,6 +94,8 @@ const pagesNotInMenu = ref(
             </Can>
         </template>
 
+        <pre>{{ menuEntries }}</pre>
+
         <div class="gap-6 flex flex-col">
             <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
                 <InputLabel label="Name" name="name" type="text" v-model="form.name" :error="form.errors.name" />
@@ -128,36 +104,60 @@ const pagesNotInMenu = ref(
 
             <!-- Entries -->
             <section>
-                <div class="mb-4 flex items-center">
-                    <h3 class="text-2xl font-medium">Entries</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-medium">Links</h3>
 
-                    <div class="gap-2 ml-auto flex items-center">
-                        <Modal variant="primary" size="2xl" label="Add Pages" title="Add Pages" position="left" v-model="pagesModal">
-                            <AsidePage @add-pages="handleAddPages" :pages="pagesNotInMenu" />
+                    <div class="gap-2 flex items-center">
+                        <Modal label="Add Link" title="Add Link" variant="primary" size="2xl" position="left" v-model="linkModal">
+                            <AsideLink :menu="menu" :menu-entries="menuEntries" @add-link="handleAddLink" />
                         </Modal>
-                        <Modal variant="outline" size="2xl" label="Add Custom Link" title="Add Custom Link" position="left" v-model="linksModal">
-                            <AsideLinks @add-link="handleAddLink" />
+                        <Modal label="Add Group" title="Add Group" variant="outline" size="2xl" position="left" v-model="groupModal">
+                            <AsideGroup :menu="menu" :menu-entries="menuEntries" @add-group="handleAddGroup" />
                         </Modal>
                     </div>
                 </div>
 
                 <Container>
-                    <VueDraggable tag="ul" class="gap-2 flex flex-col" ref="el" v-model="form.navigations">
-                        <Container
-                            tag="li"
-                            class="py-1 flex items-center justify-between hover:cursor-move"
-                            v-for="(navigation, index) in form.navigations"
-                            :key="JSON.stringify(navigation)"
-                        >
-                            <div class="gap-2 flex items-center">
-                                <IconGrip />
-                                <span class="font-medium">{{ navigation.navigable.title }}</span>
-                                <SlugCell :content="navigation.navigable.slug ?? navigation.navigable.url" />
-                            </div>
+                    <VueDraggable ref="el" tag="ul" v-model="form.entries" class="gap-2 flex flex-col">
+                        <Container class="flex justify-between" v-for="entry in form.entries" tag="li" :key="JSON.stringify(entry)">
+                            <template v-if="entry['group_id'] !== undefined">
+                                <div class="gap-2 flex items-center">
+                                    <IconGrip />
+                                    {{ entry.title }}
+                                    <SlugCell :content="entry.url" />
+                                </div>
+                            </template>
+                            <div class="gap-2 flex w-full flex-col" v-else>
+                                <div class="flex items-center justify-between">
+                                    <div class="gap-2 flex items-center">
+                                        <IconGrip />
+                                        {{ entry.name }}
+                                        {{ entry.id }}
+                                    </div>
 
-                            <Action tag="button" variant="icon" @click="removeNavigation(index)">
-                                <IconClose />
-                            </Action>
+                                    <Modal
+                                        label="Add Children"
+                                        title="Add Children"
+                                        variant="outline"
+                                        size="2xl"
+                                        position="left"
+                                        v-model="childrenModal"
+                                    >
+                                        <AsideChildren
+                                            :menu="menu"
+                                            :menu-entries="menuEntries"
+                                            :group-id="entry.id"
+                                            @add-children="handleAddChildren"
+                                        />
+                                    </Modal>
+                                </div>
+
+                                <ul>
+                                    <Container tag="li" class="flex" v-for="child in entry.links" :key="JSON.stringify(child)">
+                                        {{ child.title }}
+                                    </Container>
+                                </ul>
+                            </div>
                         </Container>
                     </VueDraggable>
                 </Container>

@@ -51,7 +51,22 @@ class HandleInertiaRequests extends Middleware
                 'blockTypes' => BlockType::all()->map(fn ($blockType) => ['name' => $blockType->name, 'type' => $blockType->type]),
                 'collectionTypes' => CollectionType::all()->map(fn ($collectionType) => ['name' => $collectionType->name, 'type' => $collectionType->type]),
             ],
-            'menus' => fn () => \App\Models\Menu::where('active', true)->get()->load('navigations.navigable'),
+            'menus' => fn () => \App\Models\Menu::where('active', true)
+                ->with(['links', 'groups.links'])
+                ->get()
+                ->map(function ($menu) {
+                    // cache entries pour éviter lazy load
+                    $entries = $menu->entries;
+
+                    // masquer groups et links
+                    unset($menu->links);
+                    unset($menu->groups);
+
+                    // optionnel : exposer entries en tant qu'attribut visible
+                    $menu->entries = $entries;
+
+                    return $menu;
+                }),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

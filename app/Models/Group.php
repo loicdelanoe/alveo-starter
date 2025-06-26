@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Link extends Model
+class Group extends Model
 {
-    /** @use HasFactory<\Database\Factories\LinkFactory> */
+    /** @use HasFactory<\Database\Factories\GroupFactory> */
     use HasFactory;
 
     protected $fillable = [
         'menu_id',
-        'group_id',
-        'title',
-        'url',
-        'target',
+        'name',
+        'slug',
         'order',
     ];
 
@@ -24,8 +22,9 @@ class Link extends Model
         return $this->belongsTo(Menu::class, 'menu_id');
     }
 
-    public function group()
+    public function links()
     {
-        return $this->belongsTo(Group::class, 'group_id');
+        return $this->hasMany(Link::class, 'group_id')
+            ->orderBy('order');
     }
 }

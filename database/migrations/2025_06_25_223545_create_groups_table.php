@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('navigations', function (Blueprint $table) {
+        Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('menu_id');
-            $table->unsignedBigInteger('parent_id')->nullable();
-
-            $table->nullableMorphs('navigable');
-            $table->string('target')->nullable();
-
+            $table->string('name');
+            $table->string('slug')->unique();
             $table->integer('order')->default(0);
             $table->timestamps();
         });
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('navigations');
+        Schema::dropIfExists('groups');
     }
 };

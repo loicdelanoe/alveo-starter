@@ -26,12 +26,8 @@ class UpdateMenuRequest extends FormRequest
             'name' => 'required|string|max:255',
             'slug' => ['required', 'string', 'max:255', 'exists:menus,slug', new Slug],
             'active' => 'boolean',
-            'navigations' => 'array',
-            'navigations.*.menu_id' => 'nullable|integer|exists:menus,id',
-            'navigations.*.parent_id' => 'nullable|integer',
-            'navigations.*.navigable_id' => 'nullable|integer',
-            'navigations.*.navigable_type' => 'nullable|string|in:page,link',
-            'navigations.*.order' => 'integer|nullable',
+            'entries' => 'array',
+            // 'links.*.id' => 'integer|exists:links,id',
         ];
     }
 
