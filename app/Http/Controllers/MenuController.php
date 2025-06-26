@@ -107,6 +107,18 @@ class MenuController extends Controller
                 $group->update([
                     'order' => $index,
                 ]);
+
+                if (! empty($entry['links'])) {
+                    foreach ($entry['links'] as $childIndex => $childEntry) {
+                        $link = $menu->links()->find($childEntry['id']);
+
+                        if ($link) {
+                            $link->update([
+                                'order' => $childIndex,
+                            ]);
+                        }
+                    }
+                }
             }
         }
 

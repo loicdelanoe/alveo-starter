@@ -8,6 +8,7 @@ import axios from 'axios';
 const props = defineProps<{
     menu: Menu;
     groupId: number;
+    group: any;
 }>();
 
 type Link = {
@@ -27,7 +28,7 @@ const form = useForm({
     title: '',
     url: '',
     blank: false,
-    order: props.menu.links.length,
+    order: props.group.links.length,
 });
 
 const onSubmit = async () => {
@@ -49,7 +50,6 @@ const onSubmit = async () => {
 
 <template>
     <form @submit.prevent="onSubmit" class="gap-2 flex flex-col">
-        <pre>{{ form }}</pre>
         <InputLabel label="Title" name="title" v-model="form.title" :error="form.errors.title" />
         <InputLabel label="Url" name="url" v-model="form.url" :error="form.errors.url" />
         <ToggleInput label="Open in other tab" name="blank" value="_blank" v-model="form.blank" :error="form.errors.blank" />

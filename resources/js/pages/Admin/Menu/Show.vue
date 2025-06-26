@@ -50,7 +50,7 @@ const handleAddLink = (link: { title: string; url: string; blank: boolean }) => 
 };
 
 const handleAddGroup = (group: { name: string; slug: string }) => {
-    form.entries.push({ ...group });
+    form.entries.push({ ...group, links: [] });
 
     groupModal.value = false;
 };
@@ -58,7 +58,7 @@ const handleAddGroup = (group: { name: string; slug: string }) => {
 const handleAddChildren = (link: { title: string; url: string; blank: boolean; group_id: number }, groupId: number) => {
     console.log('Adding children link:', link, 'to group ID:', groupId);
 
-    form.entries[form.entries.findIndex((entry) => entry.group_id === groupId)].push({
+    form.entries[form.entries.findIndex((entry) => entry.id === groupId)].links.push({
         ...link,
     });
 
@@ -94,7 +94,7 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
             </Can>
         </template>
 
-        <pre>{{ menuEntries }}</pre>
+        <!-- <pre>{{ form.entries }}</pre> -->
 
         <div class="gap-6 flex flex-col">
             <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
@@ -103,7 +103,7 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
             </Container>
 
             <!-- Entries -->
-            <section>
+            <section class="gap-4 flex flex-col">
                 <div class="flex items-center justify-between">
                     <h3 class="text-2xl font-medium">Links</h3>
 
@@ -117,7 +117,7 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
                     </div>
                 </div>
 
-                <Container>
+                <Container v-if="form.entries.length">
                     <VueDraggable ref="el" tag="ul" v-model="form.entries" class="gap-2 flex flex-col">
                         <Container class="flex justify-between" v-for="entry in form.entries" tag="li" :key="JSON.stringify(entry)">
                             <template v-if="entry['group_id'] !== undefined">
@@ -132,7 +132,7 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
                                     <div class="gap-2 flex items-center">
                                         <IconGrip />
                                         {{ entry.name }}
-                                        {{ entry.id }}
+                                        <SlugCell :content="entry.slug" />
                                     </div>
 
                                     <Modal
@@ -147,16 +147,19 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
                                             :menu="menu"
                                             :menu-entries="menuEntries"
                                             :group-id="entry.id"
+                                            :group="entry"
                                             @add-children="handleAddChildren"
                                         />
                                     </Modal>
                                 </div>
 
-                                <ul>
-                                    <Container tag="li" class="flex" v-for="child in entry.links" :key="JSON.stringify(child)">
+                                <VueDraggable tag="ul" v-model="entry.links" class="gap-2 flex flex-col">
+                                    <Container tag="li" class="gap-2 flex items-center" v-for="child in entry.links" :key="JSON.stringify(child)">
+                                        <IconGrip />
                                         {{ child.title }}
+                                        <SlugCell :content="child.url" />
                                     </Container>
-                                </ul>
+                                </VueDraggable>
                             </div>
                         </Container>
                     </VueDraggable>

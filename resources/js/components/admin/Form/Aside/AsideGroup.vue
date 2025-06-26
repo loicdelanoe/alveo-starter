@@ -42,7 +42,6 @@ const onSubmit = async () => {
 
 <template>
     <form @submit.prevent="onSubmit" class="gap-2 flex flex-col">
-        <pre>{{ form }}</pre>
         <InputLabel label="Name" name="name" v-model="form.name" :error="form.errors.name" />
         <InputLabel label="Slug" name="slug" v-model="form.slug" :error="form.errors.slug" />
         <Action tag="button" variant="primary">Add Custom Link</Action>
