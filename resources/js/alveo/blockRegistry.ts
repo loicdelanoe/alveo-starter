@@ -13,8 +13,6 @@ export async function resolveBlockComponent<T>(blockType: string, blocks: Record
             .replace(/([a-z])([A-Z])/g, '$1-$2')
             .toLowerCase();
 
-        console.log(fileName);
-
         if (!fileName) continue;
 
         if (fileName === normalized) {

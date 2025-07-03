@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { VueDraggable } from 'vue-draggable-plus';
 
 import InputLabel from '@/components/admin/Form/InputLabel.vue';
 import ToggleInput from '@/components/admin/Form/ToggleInput.vue';
@@ -8,7 +10,6 @@ import Breadcrumbs from '@/components/admin/Ui/Breadcrumbs.vue';
 import Container from '@/components/admin/Ui/Container.vue';
 import PanelLayout from '@/Layouts/PanelLayout.vue';
 import { deleteItem } from '@/utils/utils';
-import { VueDraggable } from 'vue-draggable-plus';
 
 import AsideChildren from '@/components/admin/Form/Aside/AsideChildren.vue';
 import AsideEditLink from '@/components/admin/Form/Aside/AsideEditLink.vue';
@@ -20,7 +21,6 @@ import Modal from '@/components/admin/Modal/Modal.vue';
 import SlugCell from '@/components/admin/Ui/Table/SlugCell.vue';
 import type { Menu } from '@/types/models/menu';
 import type { Page } from '@/types/models/page';
-import { ref } from 'vue';
 
 const props = defineProps<{
     menu: Menu;
