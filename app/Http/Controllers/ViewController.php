@@ -20,15 +20,7 @@ class ViewController extends Controller
     {
         $page = Page::where('is_home', true)->firstOrFail();
 
-        if ($page->status === 'draft') {
-            abort(404);
-        }
-
-        $page->load(['blocks', 'forms']);
-
-        $this->hydratePage($page);
-
-        return Inertia::render('Page/Index', compact('page'));
+        return $this->renderPage($page, 'Page/Index');
     }
 
     /**
@@ -41,19 +33,7 @@ class ViewController extends Controller
             ['is_home', false],
         ])->firstOrFail();
 
-        if ($page->status === 'draft') {
-            abort(404);
-        }
-
-        $page->load(['blocks', 'forms']);
-
-        if ($page->is_archive) {
-            $page->load('collections');
-        }
-
-        $this->hydratePage($page);
-
-        return Inertia::render('Page/Page', compact('page'));
+        return $this->renderPage($page, 'Page/Index');
     }
 
     /**
@@ -86,5 +66,24 @@ class ViewController extends Controller
             'blockTypes' => $blockTypes->only('type', 'name'),
             'collectionTypes' => $collectionTypes,
         ]);
+    }
+
+    public function renderPage(Page $page, string $view)
+    {
+        if ($page->status === 'draft') {
+            abort(404);
+        }
+
+        $relations = ['blocks', 'forms'];
+
+        if ($page->is_archive) {
+            $relations[] = 'collections';
+        }
+
+        $page->load($relations);
+
+        $this->hydratePage($page);
+
+        return Inertia::render($view, compact('page'));
     }
 }
