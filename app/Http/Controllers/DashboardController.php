@@ -16,7 +16,8 @@ class DashboardController extends Controller
         $collectionTypes = CollectionType::all();
         $blockTypes = BlockType::all();
         $menus = Menu::orderBy('id', 'desc')->take(3)->get();
-        $menus->load('pages');
+
+        $menus->load(['links', 'groups.links']);
 
         return Inertia::render('Admin/Dashboard/Index', compact('page', 'collectionTypes', 'blockTypes', 'menus'));
     }
