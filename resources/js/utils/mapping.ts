@@ -11,6 +11,7 @@ import VideoInput from '@/components/admin/Form/VideoInput.vue';
 import IconBlock from '@/components/admin/Icon/IconBlock.vue';
 import IconCheck from '@/components/admin/Icon/IconCheck.vue';
 import IconCollection from '@/components/admin/Icon/IconCollection.vue';
+import IconEdit from '@/components/admin/Icon/IconEdit.vue';
 import IconMedia from '@/components/admin/Icon/IconMedia.vue';
 import IconMenu from '@/components/admin/Icon/IconMenu.vue';
 import IconPage from '@/components/admin/Icon/IconPage.vue';
@@ -41,6 +42,7 @@ export const getIconCpt = (icon: string) => {
         block: IconBlock,
         media: IconMedia,
         menu: IconMenu,
+        edit: IconEdit,
     };
 
     return cptMap[icon] || IconPlus;

@@ -33,9 +33,9 @@ const user = computed(() => props.auth.user);
 <template>
     <PanelLayout title="Dashboard">
         <span class="text-2xl font-medium">Welcome {{ user.name }} !</span>
-        <section class="flex flex-col gap-4 py-6">
+        <section class="gap-4 py-6 flex flex-col">
             <h3 class="text-xl font-medium">Statistics</h3>
-            <dl class="flex flex-col justify-between gap-4 md:flex-row">
+            <dl class="gap-4 md:flex-row flex flex-col justify-between">
                 <StatContainer title="Pages" :collection="page" :href="route('admin.page.index')">
                     <template #action>
                         <Action tag="Link" :variant="['outline', 'icon']" :href="route('admin.page.create')">
@@ -62,8 +62,8 @@ const user = computed(() => props.auth.user);
                 </StatContainer>
             </dl>
         </section>
-        <div class="flex flex-col gap-4 md:flex-row">
-            <section class="flex w-full flex-col gap-4">
+        <div class="gap-4 md:flex-row flex flex-col">
+            <section class="gap-4 flex w-full flex-col">
                 <h3 class="text-xl font-medium">Upload Medias</h3>
                 <Container>
                     <Can permission="create medias">
@@ -81,18 +81,18 @@ const user = computed(() => props.auth.user);
                     </Can>
                 </Container>
             </section>
-            <section class="flex w-full flex-col gap-4">
+            <section class="gap-4 flex w-full flex-col">
                 <h3 class="text-xl font-medium">Last menus created</h3>
-                <Container class="flex flex-col gap-4">
+                <Container class="gap-4 flex flex-col">
                     <ul>
                         <li
                             v-for="menu in menus"
                             :key="menu.id"
-                            class="border-secondary-300 hover:bg-secondary-50 relative flex items-center justify-between rounded-lg border p-3 transition hover:underline"
+                            class="border-secondary-300 hover:bg-secondary-50 rounded-lg p-3 relative flex items-center justify-between border transition hover:underline"
                         >
                             <span class="font-medium">{{ menu.name }}</span>
-                            <span>{{ menu.pages.length }} page(s)</span>
-                            <Link class="absolute inset-0" :href="route('admin.menu.show', menu.slug)">
+                            <span>{{ menu.links.length }} link(s)</span>
+                            <Link class="inset-0 absolute" :href="route('admin.menu.show', menu.slug)">
                                 <span class="sr-only">Edit {{ menu.name }}</span>
                             </Link>
                         </li>

@@ -85,6 +85,15 @@ class MenuController extends Controller
      */
     public function update(UpdateMenuRequest $request, Menu $menu)
     {
+
+        foreach ($request->deleted as $deletedLink) {
+            $link = $menu->links()->find($deletedLink);
+
+            if ($link) {
+                $link->delete();
+            }
+        }
+
         $validated = $request->validated();
 
         $menu->update([

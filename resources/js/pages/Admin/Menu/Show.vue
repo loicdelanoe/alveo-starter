@@ -11,8 +11,10 @@ import { deleteItem } from '@/utils/utils';
 import { VueDraggable } from 'vue-draggable-plus';
 
 import AsideChildren from '@/components/admin/Form/Aside/AsideChildren.vue';
+import AsideEditLink from '@/components/admin/Form/Aside/AsideEditLink.vue';
 import AsideGroup from '@/components/admin/Form/Aside/AsideGroup.vue';
 import AsideLink from '@/components/admin/Form/Aside/AsideLink.vue';
+import IconClose from '@/components/admin/Icon/IconClose.vue';
 import IconGrip from '@/components/admin/Icon/IconGrip.vue';
 import Modal from '@/components/admin/Modal/Modal.vue';
 import SlugCell from '@/components/admin/Ui/Table/SlugCell.vue';
@@ -29,12 +31,14 @@ const props = defineProps<{
 const linkModal = ref(false);
 const groupModal = ref(false);
 const childrenModal = ref(false);
+const editLinkModal = ref(false);
 
 const form = useForm({
     name: props.menu.name,
     slug: props.menu.slug,
     active: props.menu.active,
     entries: props.menuEntries ?? [],
+    deleted: [] as number[],
 });
 
 const onSubmit = () => {
@@ -63,6 +67,12 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
     });
 
     childrenModal.value = false;
+};
+
+const removeLink = (index: number) => {
+    form.deleted.push(form.entries[index].id);
+
+    form.entries.splice(index, 1);
 };
 </script>
 
@@ -94,8 +104,6 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
             </Can>
         </template>
 
-        <!-- <pre>{{ form.entries }}</pre> -->
-
         <div class="gap-6 flex flex-col">
             <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
                 <InputLabel label="Name" name="name" type="text" v-model="form.name" :error="form.errors.name" />
@@ -119,17 +127,41 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
 
                 <Container v-if="form.entries.length">
                     <VueDraggable ref="el" tag="ul" v-model="form.entries" class="gap-2 flex flex-col">
-                        <Container class="flex justify-between" v-for="entry in form.entries" tag="li" :key="JSON.stringify(entry)">
+                        <Container
+                            class="flex cursor-move justify-between"
+                            v-for="(entry, index) in form.entries"
+                            tag="li"
+                            :key="JSON.stringify(entry)"
+                        >
+                            <!-- Link -->
                             <template v-if="entry['group_id'] !== undefined">
-                                <div class="gap-2 flex items-center">
+                                <div class="gap-2 font-medium flex items-center">
                                     <IconGrip />
                                     {{ entry.title }}
                                     <SlugCell :content="entry.url" />
                                 </div>
+
+                                <div class="gap-2 flex items-center">
+                                    <Modal
+                                        icon="edit"
+                                        :title="`Edit ${entry.title}`"
+                                        variant="icon"
+                                        size="2xl"
+                                        position="left"
+                                        v-model="editLinkModal"
+                                    >
+                                        <AsideEditLink />
+                                    </Modal>
+                                    <Action tag="button" variant="icon" @click="removeLink(index)">
+                                        <IconClose />
+                                    </Action>
+                                </div>
                             </template>
-                            <div class="gap-2 flex w-full flex-col" v-else>
+
+                            <!-- Group -->
+                            <div class="gap-2 flex w-full cursor-move flex-col" v-else>
                                 <div class="flex items-center justify-between">
-                                    <div class="gap-2 flex items-center">
+                                    <div class="gap-2 font-medium flex items-center">
                                         <IconGrip />
                                         {{ entry.name }}
                                         <SlugCell :content="entry.slug" />
@@ -153,8 +185,13 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
                                     </Modal>
                                 </div>
 
-                                <VueDraggable tag="ul" v-model="entry.links" class="gap-2 flex flex-col">
-                                    <Container tag="li" class="gap-2 flex items-center" v-for="child in entry.links" :key="JSON.stringify(child)">
+                                <VueDraggable v-if="entry.links.length" tag="ul" v-model="entry.links" class="gap-2 flex flex-col">
+                                    <Container
+                                        tag="li"
+                                        class="gap-2 font-medium flex cursor-move items-center"
+                                        v-for="child in entry.links"
+                                        :key="JSON.stringify(child)"
+                                    >
                                         <IconGrip />
                                         {{ child.title }}
                                         <SlugCell :content="child.url" />

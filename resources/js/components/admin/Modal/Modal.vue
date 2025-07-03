@@ -5,10 +5,10 @@ import IconClose from '@/components/admin/Icon/IconClose.vue';
 import { getIconCpt } from '@/utils/mapping';
 
 const props = defineProps<{
-    label: string;
+    label?: string;
     title: string;
     subtitle?: string;
-    variant: 'primary' | 'secondary' | 'outline';
+    variant: 'primary' | 'secondary' | 'outline' | 'icon';
     size: 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
     position: 'left' | 'center';
     icon?: string;

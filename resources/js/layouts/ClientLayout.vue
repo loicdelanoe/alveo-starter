@@ -15,7 +15,7 @@ const pageProps = usePage().props;
 
 const title = computed(() => `${props.page.title} - ${pageProps.settings.site_name}`);
 
-const mainNavigation = getMenu('test');
+const mainNavigation = getMenu('main-navigation');
 </script>
 
 <template>

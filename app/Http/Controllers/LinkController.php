@@ -23,6 +23,8 @@ class LinkController extends Controller
         return response()->json($link, 201);
     }
 
+    public function update(Request $request) {}
+
     public function destroy(Link $link)
     {
         $link->delete();
