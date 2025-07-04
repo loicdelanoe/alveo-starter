@@ -12,11 +12,14 @@ import PanelLayout from '@/Layouts/PanelLayout.vue';
 import { deleteItem } from '@/utils/utils';
 
 import AsideChildren from '@/components/admin/Form/Aside/AsideChildren.vue';
+import AsideEditGroup from '@/components/admin/Form/Aside/AsideEditGroup.vue';
 import AsideEditLink from '@/components/admin/Form/Aside/AsideEditLink.vue';
 import AsideGroup from '@/components/admin/Form/Aside/AsideGroup.vue';
 import AsideLink from '@/components/admin/Form/Aside/AsideLink.vue';
 import IconClose from '@/components/admin/Icon/IconClose.vue';
+import IconEdit from '@/components/admin/Icon/IconEdit.vue';
 import IconGrip from '@/components/admin/Icon/IconGrip.vue';
+import GlobalModal from '@/components/admin/Modal/GlobalModal.vue';
 import Modal from '@/components/admin/Modal/Modal.vue';
 import SlugCell from '@/components/admin/Ui/Table/SlugCell.vue';
 import type { Menu } from '@/types/models/menu';
@@ -31,7 +34,13 @@ const props = defineProps<{
 const linkModal = ref(false);
 const groupModal = ref(false);
 const childrenModal = ref(false);
-const editLinkModal = ref(false);
+const editGroupModal = ref(false);
+const editChildModal = ref(false);
+
+const isOpen = ref(false);
+const linkIndex = ref(0);
+
+const childIndex = ref(0);
 
 const form = useForm({
     name: props.menu.name,
@@ -81,6 +90,39 @@ const removeGroup = (index: number) => {
 
     form.entries.splice(index, 1);
 };
+
+const openModal = (index: number) => {
+    isOpen.value = true;
+
+    linkIndex.value = index;
+};
+
+const openEditGroup = (index: number) => {
+    editGroupModal.value = true;
+
+    linkIndex.value = index;
+};
+
+const openChildGroup = (parentIndex: number, index: number) => {
+    editChildModal.value = true;
+
+    linkIndex.value = parentIndex;
+    childIndex.value = index;
+};
+
+const updateData = (data: any) => {
+    form.entries[linkIndex.value] = { ...form.entries[linkIndex.value], ...data };
+};
+
+const updateChild = (data: any) => {
+    form.entries[linkIndex.value].links[childIndex.value] = { ...form.entries[linkIndex.value].links[childIndex.value], ...data };
+};
+
+const removeChild = (parentId: number, index: number) => {
+    form.deletedLinks.push(form.entries[parentId].links[index].id);
+
+    form.entries[parentId].links.splice(index, 1);
+};
 </script>
 
 <template>
@@ -110,8 +152,6 @@ const removeGroup = (index: number) => {
                 </Action>
             </Can>
         </template>
-
-        <pre>{{ form }}</pre>
 
         <div class="gap-6 flex flex-col">
             <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
@@ -150,17 +190,11 @@ const removeGroup = (index: number) => {
                                     <SlugCell :content="entry.url" />
                                 </div>
 
-                                <div class="gap-2 flex items-center">
-                                    <Modal
-                                        icon="edit"
-                                        :title="`Edit ${entry.title}`"
-                                        variant="icon"
-                                        size="2xl"
-                                        position="left"
-                                        v-model="editLinkModal"
-                                    >
-                                        <AsideEditLink />
-                                    </Modal>
+                                <div class="flex items-center">
+                                    <Action tag="button" variant="icon" @click="openModal(index)">
+                                        <IconEdit />
+                                        <span class="sr-only">Edit {{ entry.title }}</span>
+                                    </Action>
                                     <Action tag="button" variant="icon" @click="removeLink(index)">
                                         <IconClose />
                                     </Action>
@@ -176,15 +210,8 @@ const removeGroup = (index: number) => {
                                         <SlugCell :content="entry.slug" />
                                     </div>
 
-                                    <div class="gap-2 flex items-center">
-                                        <Modal
-                                            label="Add Children"
-                                            title="Add Children"
-                                            variant="outline"
-                                            size="2xl"
-                                            position="left"
-                                            v-model="childrenModal"
-                                        >
+                                    <div class="flex items-center">
+                                        <Modal title="Add Children" variant="icon" size="2xl" position="left" icon="plus" v-model="childrenModal">
                                             <AsideChildren
                                                 :menu="menu"
                                                 :menu-entries="menuEntries"
@@ -193,6 +220,10 @@ const removeGroup = (index: number) => {
                                                 @add-children="handleAddChildren"
                                             />
                                         </Modal>
+                                        <Action tag="button" variant="icon" @click="openEditGroup(index)">
+                                            <IconEdit />
+                                            <span class="sr-only">Edit {{ entry.title }}</span>
+                                        </Action>
                                         <Action tag="button" variant="icon" @click="removeGroup(index)">
                                             <IconClose />
                                         </Action>
@@ -202,19 +233,48 @@ const removeGroup = (index: number) => {
                                 <VueDraggable v-if="entry.links.length" tag="ul" v-model="entry.links" class="gap-2 flex flex-col">
                                     <Container
                                         tag="li"
-                                        class="gap-2 font-medium flex cursor-move items-center"
-                                        v-for="child in entry.links"
+                                        class="flex cursor-move items-center justify-between"
+                                        v-for="(child, childIndex) in entry.links"
                                         :key="JSON.stringify(child)"
                                     >
-                                        <IconGrip />
-                                        {{ child.title }}
-                                        <SlugCell :content="child.url" />
+                                        <div class="gap-2 font-medium flex items-center">
+                                            <IconGrip />
+                                            {{ child.title }}
+                                            <SlugCell :content="child.url" />
+                                        </div>
+
+                                        <div class="flex items-center">
+                                            <Action tag="button" variant="icon" @click="openChildGroup(index, childIndex)">
+                                                <IconEdit />
+                                                <span class="sr-only">Edit {{ child.title }}</span>
+                                            </Action>
+                                            <Action tag="button" variant="icon" @click="removeChild(index, childIndex)">
+                                                <IconClose />
+                                            </Action>
+                                        </div>
                                     </Container>
                                 </VueDraggable>
                             </div>
                         </Container>
                     </VueDraggable>
                 </Container>
+
+                <!-- Modal -->
+                <GlobalModal v-model:is-open="isOpen" size="2xl" position="left" title="Edit Link">
+                    <AsideEditLink :item="form.entries[linkIndex]" @close-modal="isOpen = false" @update-data="updateData" />
+                </GlobalModal>
+
+                <GlobalModal v-model:is-open="editGroupModal" size="2xl" position="left" title="Edit Group">
+                    <AsideEditGroup :group="form.entries[linkIndex]" @close-modal="editGroupModal = false" @update-data="updateData" />
+                </GlobalModal>
+
+                <GlobalModal v-model:is-open="editChildModal" size="2xl" position="left" title="Edit Child">
+                    <AsideEditLink
+                        :item="form.entries[linkIndex].links[childIndex]"
+                        @close-modal="editChildModal = false"
+                        @update-data="updateChild"
+                    />
+                </GlobalModal>
             </section>
         </div>
     </PanelLayout>

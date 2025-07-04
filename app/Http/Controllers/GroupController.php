@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -18,5 +19,15 @@ class GroupController extends Controller
         $group = \App\Models\Group::create($validated);
 
         return response()->json($group, 201);
+    }
+
+    public function update(Request $request, Group $group)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string',
+        ]);
+
+        $group->update($validated);
     }
 }

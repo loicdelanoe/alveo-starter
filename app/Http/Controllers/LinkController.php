@@ -23,7 +23,17 @@ class LinkController extends Controller
         return response()->json($link, 201);
     }
 
-    public function update(Request $request) {}
+    public function update(Request $request, Link $link) {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'target' => 'nullable|boolean',
+        ]);
+
+        $link->update($validated);
+
+        // return response()->json($link, 200);
+    }
 
     public function destroy(Link $link)
     {
