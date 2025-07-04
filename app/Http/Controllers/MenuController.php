@@ -86,11 +86,19 @@ class MenuController extends Controller
     public function update(UpdateMenuRequest $request, Menu $menu)
     {
 
-        foreach ($request->deleted as $deletedLink) {
+        foreach ($request->deletedLinks as $deletedLink) {
             $link = $menu->links()->find($deletedLink);
 
             if ($link) {
                 $link->delete();
+            }
+        }
+
+        foreach ($request->deletedGroups as $deletedGroup) {
+            $group = $menu->groups()->find($deletedGroup);
+
+            if ($group) {
+                $group->delete();
             }
         }
 

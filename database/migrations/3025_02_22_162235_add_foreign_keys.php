@@ -48,6 +48,7 @@ return new class extends Migration
 
         Schema::table('links', function (Blueprint $table) {
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
         });
 
         Schema::table('groups', function (Blueprint $table) {

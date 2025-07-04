@@ -38,7 +38,8 @@ const form = useForm({
     slug: props.menu.slug,
     active: props.menu.active,
     entries: props.menuEntries ?? [],
-    deleted: [] as number[],
+    deletedLinks: [] as number[],
+    deletedGroups: [] as number[],
 });
 
 const onSubmit = () => {
@@ -70,7 +71,13 @@ const handleAddChildren = (link: { title: string; url: string; blank: boolean; g
 };
 
 const removeLink = (index: number) => {
-    form.deleted.push(form.entries[index].id);
+    form.deletedLinks.push(form.entries[index].id);
+
+    form.entries.splice(index, 1);
+};
+
+const removeGroup = (index: number) => {
+    form.deletedGroups.push(form.entries[index].id);
 
     form.entries.splice(index, 1);
 };
@@ -103,6 +110,8 @@ const removeLink = (index: number) => {
                 </Action>
             </Can>
         </template>
+
+        <pre>{{ form }}</pre>
 
         <div class="gap-6 flex flex-col">
             <Container class="gap-4 md:flex-row md:gap-6 flex flex-col">
@@ -167,22 +176,27 @@ const removeLink = (index: number) => {
                                         <SlugCell :content="entry.slug" />
                                     </div>
 
-                                    <Modal
-                                        label="Add Children"
-                                        title="Add Children"
-                                        variant="outline"
-                                        size="2xl"
-                                        position="left"
-                                        v-model="childrenModal"
-                                    >
-                                        <AsideChildren
-                                            :menu="menu"
-                                            :menu-entries="menuEntries"
-                                            :group-id="entry.id"
-                                            :group="entry"
-                                            @add-children="handleAddChildren"
-                                        />
-                                    </Modal>
+                                    <div class="gap-2 flex items-center">
+                                        <Modal
+                                            label="Add Children"
+                                            title="Add Children"
+                                            variant="outline"
+                                            size="2xl"
+                                            position="left"
+                                            v-model="childrenModal"
+                                        >
+                                            <AsideChildren
+                                                :menu="menu"
+                                                :menu-entries="menuEntries"
+                                                :group-id="entry.id"
+                                                :group="entry"
+                                                @add-children="handleAddChildren"
+                                            />
+                                        </Modal>
+                                        <Action tag="button" variant="icon" @click="removeGroup(index)">
+                                            <IconClose />
+                                        </Action>
+                                    </div>
                                 </div>
 
                                 <VueDraggable v-if="entry.links.length" tag="ul" v-model="entry.links" class="gap-2 flex flex-col">
